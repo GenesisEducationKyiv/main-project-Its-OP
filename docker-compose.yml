@@ -3,7 +3,7 @@ version: '3.8'
 services:
   go_web:
     build:
-      context: .
+      context: src/.
       dockerfile: Dockerfile
     volumes:
       - data:/app/data
