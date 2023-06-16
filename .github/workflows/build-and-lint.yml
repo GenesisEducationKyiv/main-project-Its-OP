@@ -25,6 +25,10 @@ jobs:
       run: go mod download
       working-directory: ./src
 
+    - name: Vendor dependencies
+      run: go mod vendor
+      working-directory: ./src
+
     - name: Build
       run: go build -v ./...
       working-directory: ./src
