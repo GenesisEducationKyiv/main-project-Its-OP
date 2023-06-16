@@ -14,16 +14,23 @@ type FileEmailRepository struct {
 	Emails hashset.Set
 }
 
-func NewFileEmailRepository() *FileEmailRepository {
+func NewFileEmailRepository() (*FileEmailRepository, error) {
 	emails := *hashset.New()
 
 	if fileExists() {
-		data, _ := os.ReadFile(storageFile)
-		emails.FromJSON(data)
+		data, err := os.ReadFile(storageFile)
+		if err != nil {
+			return nil, err
+		}
+
+		err = emails.FromJSON(data)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	repo := FileEmailRepository{Emails: emails}
-	return &repo
+	return &repo, nil
 }
 
 func (repo *FileEmailRepository) AddEmail(email string) error {
@@ -50,14 +57,27 @@ func (repo *FileEmailRepository) GetAll() []string {
 	return emailsArray
 }
 
-func (repo *FileEmailRepository) Save() {
-	data, _ := repo.Emails.MarshalJSON()
-
-	if !fileExists() {
-		createFile(storageFile)
+func (repo *FileEmailRepository) Save() error {
+	data, err := repo.Emails.MarshalJSON()
+	if err != nil {
+		return err
 	}
 
-	os.WriteFile(storageFile, data, 0644)
+	if !fileExists() {
+		err = createFile(storageFile)
+		if err != nil {
+			return err
+		}
+	}
+
+	permissionCode := 0644
+
+	err = os.WriteFile(storageFile, data, os.FileMode(permissionCode))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func fileExists() bool {
@@ -69,11 +89,22 @@ func fileExists() bool {
 	return !info.IsDir()
 }
 
-func createFile(filePath string) {
+func createFile(filePath string) error {
 	dirPath := filepath.Dir(filePath)
 
-	_ = os.MkdirAll(dirPath, 0755)
-	file, _ := os.Create(filePath)
+	permissionCode := 0755
+
+	err := os.MkdirAll(dirPath, os.FileMode(permissionCode))
+
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
 
 	defer file.Close()
+	return nil
 }

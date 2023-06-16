@@ -15,7 +15,7 @@ type ICoinClient interface {
 type IEmailRepository interface {
 	AddEmail(email string) error
 	GetAll() []string
-	Save()
+	Save() error
 }
 
 type IEmailClient interface {
