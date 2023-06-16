@@ -2,7 +2,6 @@ package web
 
 import (
 	"btcRate/domain"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -23,7 +22,7 @@ func errorHandlingMiddleware() gin.HandlerFunc {
 				} else if _, ok := e.Err.(*domain.DatabaseError); ok {
 					c.String(http.StatusInternalServerError, e.Error())
 					nestedErr := e.Unwrap()
-					log.Println(fmt.Sprintf("ERROR: Database error, %v", nestedErr))
+					log.Printf("ERROR: Database error, %v", nestedErr)
 				}
 			}
 		}

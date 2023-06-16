@@ -46,7 +46,10 @@ func RunBtcUahController() error {
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	r.Run(":8080") // Run on port 8080
+	err = r.Run(":8080") // Run on port 8080
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -62,7 +65,7 @@ func getRate(c *gin.Context) {
 	price, err := btcuahService.GetCurrentRate(currency, coin)
 
 	if err != nil {
-		c.Error(err)
+		_ = c.Error(err)
 		return
 	}
 
@@ -92,7 +95,7 @@ func subscribe(c *gin.Context) {
 
 	err := btcuahService.Subscribe(email)
 	if err != nil {
-		c.Error(err)
+		_ = c.Error(err)
 		return
 	}
 

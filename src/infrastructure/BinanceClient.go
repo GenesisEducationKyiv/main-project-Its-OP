@@ -43,7 +43,7 @@ func (binanceClient *BinanceClient) GetRate(currency string, coin string) (float
 	var result PriceResponse
 	_ = json.Unmarshal(respBody, &result)
 
-	price, _ := strconv.ParseFloat(result.Price, 10)
+	price, _ := strconv.ParseFloat(result.Price, 64)
 
 	return price, timestamp, nil
 }
