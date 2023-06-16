@@ -37,7 +37,11 @@ func (coinService *CoinService) Subscribe(email string) error {
 		return err
 	}
 
-	coinService.emailRepository.Save()
+	err = coinService.emailRepository.Save()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -45,7 +49,6 @@ func (coinService *CoinService) SendRateEmails(currency string, coin string) {
 	emails := coinService.emailRepository.GetAll()
 
 	currentPrice, err := coinService.GetCurrentRate(currency, coin)
-
 	if err != nil {
 		return
 	}

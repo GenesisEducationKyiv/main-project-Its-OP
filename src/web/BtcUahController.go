@@ -24,9 +24,13 @@ const coin = "BTC"
 
 var btcuahService domain.ICoinService
 
-func RunBtcUahController() {
+func RunBtcUahController() error {
+	var emailRepository, err = infrastructure.NewFileEmailRepository()
+	if err != nil {
+		return err
+	}
+
 	var bitcoinClient = infrastructure.NewBinanceClient()
-	var emailRepository = infrastructure.NewFileEmailRepository()
 	var emailClient = infrastructure.NewSendGridEmailClient(os.Getenv("SENDGRID_API_KEY"), os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
 	btcuahService = application.NewCoinService(bitcoinClient, emailClient, emailRepository)
 
@@ -43,6 +47,8 @@ func RunBtcUahController() {
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	r.Run(":8080") // Run on port 8080
+
+	return nil
 }
 
 // @Summary Get current BTC to UAH rate

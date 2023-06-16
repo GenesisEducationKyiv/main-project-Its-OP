@@ -25,3 +25,7 @@ type DatabaseError struct {
 func (e *DatabaseError) Error() string {
 	return databaseErrorMessage
 }
+
+func (e *DatabaseError) Unwrap() error {
+	return e.NestedError
+}

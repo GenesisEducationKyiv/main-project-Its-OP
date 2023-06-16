@@ -1,7 +1,13 @@
 package main
 
-import "btcRate/web"
+import (
+	"btcRate/web"
+	"log"
+)
 
 func main() {
-	web.RunBtcUahController()
+	err := web.RunBtcUahController()
+	if err == nil {
+		log.Fatal(err)
+	}
 }

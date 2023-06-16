@@ -2,7 +2,9 @@ package web
 
 import (
 	"btcRate/domain"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
@@ -15,11 +17,13 @@ func errorHandlingMiddleware() gin.HandlerFunc {
 			for _, e := range c.Errors {
 				// Check if the error is a CustomError
 				if _, ok := e.Err.(*domain.EndpointInaccessibleError); ok {
-					// If it is, respond with status code 400
 					c.String(http.StatusBadRequest, e.Error())
 				} else if _, ok := e.Err.(*domain.DataConsistencyError); ok {
-					// If it is, respond with status code 400
 					c.String(http.StatusConflict, e.Error())
+				} else if _, ok := e.Err.(*domain.DatabaseError); ok {
+					c.String(http.StatusInternalServerError, e.Error())
+					nestedErr := e.Unwrap()
+					log.Println(fmt.Sprintf("ERROR: Database error, %v", nestedErr))
 				}
 			}
 		}
