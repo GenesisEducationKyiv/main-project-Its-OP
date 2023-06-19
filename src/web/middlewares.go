@@ -17,7 +17,7 @@ func errorHandlingMiddleware() gin.HandlerFunc {
 					c.String(http.StatusBadRequest, e.Error())
 				} else if _, ok := e.Err.(*domain.DataConsistencyError); ok {
 					c.String(http.StatusConflict, e.Error())
-				} else if _, ok := e.Err.(*domain.DatabaseError); ok {
+				} else if _, ok := e.Err.(*domain.InternalError); ok {
 					c.String(http.StatusInternalServerError, e.Error())
 					nestedErr := e.Unwrap()
 					log.Printf("ERROR: Database error, %v", nestedErr)

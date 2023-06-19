@@ -20,13 +20,13 @@ func NewFileEmailRepository() (*FileEmailRepository, error) {
 	if fileExists() {
 		data, err := os.ReadFile(storageFile)
 		if err != nil {
-			dbError := &domain.DatabaseError{NestedError: err}
+			dbError := &domain.InternalError{NestedError: err}
 			return nil, dbError
 		}
 
 		err = emails.FromJSON(data)
 		if err != nil {
-			dbError := &domain.DatabaseError{NestedError: err}
+			dbError := &domain.InternalError{NestedError: err}
 			return nil, dbError
 		}
 	}
@@ -62,14 +62,14 @@ func (r *FileEmailRepository) GetAll() []string {
 func (r *FileEmailRepository) Save() error {
 	data, err := r.Emails.MarshalJSON()
 	if err != nil {
-		dbError := &domain.DatabaseError{NestedError: err}
+		dbError := &domain.InternalError{NestedError: err}
 		return dbError
 	}
 
 	if !fileExists() {
 		err = createFile(storageFile)
 		if err != nil {
-			dbError := &domain.DatabaseError{NestedError: err}
+			dbError := &domain.InternalError{NestedError: err}
 			return dbError
 		}
 	}
@@ -78,7 +78,7 @@ func (r *FileEmailRepository) Save() error {
 
 	err = os.WriteFile(storageFile, data, os.FileMode(permissionCode))
 	if err != nil {
-		dbError := &domain.DatabaseError{NestedError: err}
+		dbError := &domain.InternalError{NestedError: err}
 		return dbError
 	}
 
@@ -102,13 +102,13 @@ func createFile(filePath string) error {
 	err := os.MkdirAll(dirPath, os.FileMode(permissionCode))
 
 	if err != nil {
-		dbError := &domain.DatabaseError{NestedError: err}
+		dbError := &domain.InternalError{NestedError: err}
 		return dbError
 	}
 
 	file, err := os.Create(filePath)
 	if err != nil {
-		dbError := &domain.DatabaseError{NestedError: err}
+		dbError := &domain.InternalError{NestedError: err}
 		return dbError
 	}
 

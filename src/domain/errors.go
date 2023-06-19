@@ -4,7 +4,7 @@ type DataConsistencyError struct {
 	Message string
 }
 
-func (e *DataConsistencyError) Error() string {
+func (e DataConsistencyError) Error() string {
 	return e.Message
 }
 
@@ -12,20 +12,20 @@ type EndpointInaccessibleError struct {
 	Message string
 }
 
-func (e *EndpointInaccessibleError) Error() string {
+func (e EndpointInaccessibleError) Error() string {
 	return e.Message
 }
 
-const databaseErrorMessage = "There was an issue with the database. Please try again later."
+const internalErrorMessage = "Internal server error. Please try again later."
 
-type DatabaseError struct {
+type InternalError struct {
 	NestedError error
 }
 
-func (e *DatabaseError) Error() string {
-	return databaseErrorMessage
+func (e InternalError) Error() string {
+	return internalErrorMessage
 }
 
-func (e *DatabaseError) Unwrap() error {
+func (e InternalError) Unwrap() error {
 	return e.NestedError
 }

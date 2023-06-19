@@ -1,10 +1,10 @@
 package infrastructure
 
 import (
+	"btcRate/domain"
 	"fmt"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
-	"log"
 )
 
 type SendGridEmailClient struct {
@@ -17,9 +17,9 @@ func NewSendGridEmailClient(client *sendgrid.Client, senderName string, senderEm
 	return &SendGridEmailClient{client: client, senderName: senderName, senderEmail: senderEmail}
 }
 
-func (s *SendGridEmailClient) Send(recipients []string, htmlContent string) {
+func (s *SendGridEmailClient) Send(recipients []string, htmlContent string) error {
 	if len(recipients) == 0 {
-		return
+		return nil
 	}
 
 	from := mail.NewEmail(s.senderName, s.senderEmail)
@@ -35,10 +35,12 @@ func (s *SendGridEmailClient) Send(recipients []string, htmlContent string) {
 
 	response, err := s.client.Send(message)
 	if err != nil {
-		log.Fatalln(err)
+		return domain.InternalError{NestedError: err}
 	} else {
 		fmt.Println(response.StatusCode)
 		fmt.Println(response.Body)
 		fmt.Println(response.Headers)
 	}
+
+	return nil
 }
