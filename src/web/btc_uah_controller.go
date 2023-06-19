@@ -6,6 +6,7 @@ import (
 	"btcRate/domain"
 	"btcRate/infrastructure"
 	"github.com/gin-gonic/gin"
+	"github.com/sendgrid/sendgrid-go"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"net/http"
@@ -31,7 +32,8 @@ func RunBtcUahController() error {
 	}
 
 	var bitcoinClient = infrastructure.NewBinanceClient()
-	var emailClient = infrastructure.NewSendGridEmailClient(os.Getenv("SENDGRID_API_KEY"), os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
+	var sendgrid = sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
+	var emailClient = infrastructure.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
 	btcuahService = application.NewCoinService(bitcoinClient, emailClient, emailRepository)
 
 	r := gin.Default()

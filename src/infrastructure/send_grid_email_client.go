@@ -8,13 +8,13 @@ import (
 )
 
 type SendGridEmailClient struct {
-	apiKey      string
+	client      *sendgrid.Client
 	senderName  string
 	senderEmail string
 }
 
-func NewSendGridEmailClient(apiKey string, senderName string, senderEmail string) *SendGridEmailClient {
-	return &SendGridEmailClient{apiKey: apiKey, senderName: senderName, senderEmail: senderEmail}
+func NewSendGridEmailClient(client *sendgrid.Client, senderName string, senderEmail string) *SendGridEmailClient {
+	return &SendGridEmailClient{client: client, senderName: senderName, senderEmail: senderEmail}
 }
 
 func (s *SendGridEmailClient) Send(recipients []string, htmlContent string) {
@@ -33,9 +33,7 @@ func (s *SendGridEmailClient) Send(recipients []string, htmlContent string) {
 		message.AddPersonalizations(personalization)
 	}
 
-	client := sendgrid.NewSendClient(s.apiKey)
-
-	response, err := client.Send(message)
+	response, err := s.client.Send(message)
 	if err != nil {
 		log.Fatalln(err)
 	} else {
