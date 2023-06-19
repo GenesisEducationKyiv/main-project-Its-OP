@@ -1,7 +1,6 @@
 package infrastructure
 
 import (
-	"btcRate/domain"
 	"fmt"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -35,7 +34,7 @@ func (s *SendGridEmailClient) Send(recipients []string, htmlContent string) erro
 
 	response, err := s.client.Send(message)
 	if err != nil {
-		return domain.InternalError{NestedError: err}
+		return err
 	} else {
 		fmt.Println(response.StatusCode)
 		fmt.Println(response.Body)

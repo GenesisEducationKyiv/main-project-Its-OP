@@ -32,12 +32,21 @@ func (b *BinanceClient) GetRate(currency string, coin string) (float64, time.Tim
 
 	timestamp := time.Now()
 
-	respBody, _ := io.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return 0.0, time.Time{}, err
+	}
 
 	var result PriceResponse
-	_ = json.Unmarshal(respBody, &result)
+	err = json.Unmarshal(respBody, &result)
+	if err != nil {
+		return 0.0, time.Time{}, err
+	}
 
-	price, _ := strconv.ParseFloat(result.Price, 64)
+	price, err := strconv.ParseFloat(result.Price, 64)
+	if err != nil {
+		return 0.0, time.Time{}, err
+	}
 
 	return price, timestamp, nil
 }

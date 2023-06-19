@@ -19,5 +19,5 @@ type IEmailRepository interface {
 }
 
 type IEmailClient interface {
-	Send(recipients []string, htmlContent string)
+	Send(recipients []string, htmlContent string) error
 }

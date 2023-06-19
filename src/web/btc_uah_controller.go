@@ -67,7 +67,7 @@ func getRate(c *gin.Context) {
 	price, err := btcuahService.GetCurrentRate(currency, coin)
 
 	if err != nil {
-		_ = c.Error(err)
+		c.Error(err)
 		return
 	}
 
@@ -90,14 +90,17 @@ func subscribe(c *gin.Context) {
 		return
 	}
 
-	if !validateEmail(&email) {
+	if valid, err := validateEmail(&email); err != nil {
+		c.Error(err)
+		return
+	} else if !valid {
 		c.String(http.StatusBadRequest, "Email is invalid")
 		return
 	}
 
 	err := btcuahService.Subscribe(email)
 	if err != nil {
-		_ = c.Error(err)
+		c.Error(err)
 		return
 	}
 
@@ -116,9 +119,12 @@ func sendEmails(c *gin.Context) {
 	c.String(http.StatusOK, "E-mails sent")
 }
 
-func validateEmail(email *string) bool {
+func validateEmail(email *string) (bool, error) {
 	regexString := "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-	match, _ := regexp.Match(regexString, []byte(*email))
+	match, err := regexp.Match(regexString, []byte(*email))
+	if err != nil {
+		return false, err
+	}
 
-	return match
+	return match, nil
 }
