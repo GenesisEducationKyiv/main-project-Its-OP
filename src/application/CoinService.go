@@ -12,9 +12,7 @@ type CoinService struct {
 }
 
 func NewCoinService(client domain.ICoinClient, emailClient domain.IEmailClient, emailRepository domain.IEmailRepository) *CoinService {
-	service := &CoinService{coinClient: client, emailClient: emailClient, emailRepository: emailRepository}
-
-	return service
+	return &CoinService{coinClient: client, emailClient: emailClient, emailRepository: emailRepository}
 }
 
 func (coinService *CoinService) GetCurrentRate(currency string, coin string) (*domain.Price, error) {

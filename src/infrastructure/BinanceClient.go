@@ -18,13 +18,7 @@ type BinanceClient struct {
 
 func NewBinanceClient() *BinanceClient {
 	baseUrl := &url.URL{Scheme: "https", Host: "api.binance.com", Path: "/api/v3"}
-
-	binanceClient := &BinanceClient{
-		client:  http.DefaultClient,
-		baseURL: baseUrl,
-	}
-
-	return binanceClient
+	return &BinanceClient{client: http.DefaultClient, baseURL: baseUrl}
 }
 
 func (binanceClient *BinanceClient) GetRate(currency string, coin string) (float64, time.Time, error) {

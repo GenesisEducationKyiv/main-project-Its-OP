@@ -14,9 +14,7 @@ type SendGridEmailClient struct {
 }
 
 func NewSendGridEmailClient(apiKey string, senderName string, senderEmail string) *SendGridEmailClient {
-	client := &SendGridEmailClient{apiKey: apiKey, senderName: senderName, senderEmail: senderEmail}
-
-	return client
+	return &SendGridEmailClient{apiKey: apiKey, senderName: senderName, senderEmail: senderEmail}
 }
 
 func (emailClient *SendGridEmailClient) Send(recipients []string, htmlContent string) {
