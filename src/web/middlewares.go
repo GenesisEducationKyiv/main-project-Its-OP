@@ -7,20 +7,22 @@ import (
 	"net/http"
 )
 
+const defaultErrorMessage = "Internal server error. Please try again later."
+
 func errorHandlingMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
 
 		if len(c.Errors) > 0 {
 			for _, e := range c.Errors {
-				if _, ok := e.Err.(*domain.EndpointInaccessibleError); ok {
+				switch e := e.Err.(type) {
+				case *domain.EndpointInaccessibleError:
 					c.String(http.StatusBadRequest, e.Error())
-				} else if _, ok := e.Err.(*domain.DataConsistencyError); ok {
+				case *domain.DataConsistencyError:
 					c.String(http.StatusConflict, e.Error())
-				} else if _, ok := e.Err.(*domain.InternalError); ok {
-					c.String(http.StatusInternalServerError, e.Error())
-					nestedErr := e.Unwrap()
-					log.Printf("ERROR: Database error, %v", nestedErr)
+				default:
+					c.String(http.StatusInternalServerError, defaultErrorMessage)
+					log.Printf("ERROR: Internal server error, %v", e)
 				}
 			}
 		}
