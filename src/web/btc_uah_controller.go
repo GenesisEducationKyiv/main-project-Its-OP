@@ -67,7 +67,7 @@ func getRate(c *gin.Context) {
 	price, err := btcuahService.GetCurrentRate(currency, coin)
 
 	if err != nil {
-		c.Error(err)
+		_ = c.Error(err)
 		return
 	}
 
@@ -91,7 +91,7 @@ func subscribe(c *gin.Context) {
 	}
 
 	if valid, err := validateEmail(&email); err != nil {
-		c.Error(err)
+		_ = c.Error(err)
 		return
 	} else if !valid {
 		c.String(http.StatusBadRequest, "Email is invalid")
@@ -100,7 +100,7 @@ func subscribe(c *gin.Context) {
 
 	err := btcuahService.Subscribe(email)
 	if err != nil {
-		c.Error(err)
+		_ = c.Error(err)
 		return
 	}
 
@@ -116,7 +116,7 @@ func subscribe(c *gin.Context) {
 func sendEmails(c *gin.Context) {
 	err := btcuahService.SendRateEmails(currency, coin)
 	if err != nil {
-		c.Error(err)
+		_ = c.Error(err)
 		return
 	}
 
