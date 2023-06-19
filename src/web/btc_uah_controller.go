@@ -114,7 +114,11 @@ func subscribe(c *gin.Context) {
 // @Success 200 {object} string "E-mails sent"
 // @Router /sendEmails [post]
 func sendEmails(c *gin.Context) {
-	btcuahService.SendRateEmails(currency, coin)
+	err := btcuahService.SendRateEmails(currency, coin)
+	if err != nil {
+		c.Error(err)
+		return
+	}
 
 	c.String(http.StatusOK, "E-mails sent")
 }

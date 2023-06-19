@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
+	"net/http"
 )
 
 type SendGridEmailClient struct {
@@ -35,10 +36,9 @@ func (s *SendGridEmailClient) Send(recipients []string, htmlContent string) erro
 	response, err := s.client.Send(message)
 	if err != nil {
 		return err
-	} else {
-		fmt.Println(response.StatusCode)
-		fmt.Println(response.Body)
-		fmt.Println(response.Headers)
+	} else if response.StatusCode != http.StatusOK {
+		err = fmt.Errorf("error sending an email. %d: %s", response.StatusCode, response.Body)
+		return err
 	}
 
 	return nil

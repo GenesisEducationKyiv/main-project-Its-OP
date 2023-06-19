@@ -43,12 +43,12 @@ func (coinService *CoinService) Subscribe(email string) error {
 	return nil
 }
 
-func (coinService *CoinService) SendRateEmails(currency string, coin string) {
+func (coinService *CoinService) SendRateEmails(currency string, coin string) error {
 	emails := coinService.emailRepository.GetAll()
 
 	currentPrice, err := coinService.GetCurrentRate(currency, coin)
 	if err != nil {
-		return
+		return err
 	}
 
 	htmlTemplate := `<p><strong>Amount:</strong> %f</p>
@@ -56,5 +56,10 @@ func (coinService *CoinService) SendRateEmails(currency string, coin string) {
 	<p><strong>Timestamp:</strong> %s<p>`
 	htmlBody := fmt.Sprintf(htmlTemplate, currentPrice.Amount, currentPrice.Currency, currentPrice.Timestamp.Format("02-01-06 15:04:05.999 Z0700"))
 
-	coinService.emailClient.Send(emails, htmlBody)
+	err = coinService.emailClient.Send(emails, htmlBody)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

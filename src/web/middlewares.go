@@ -3,7 +3,6 @@ package web
 import (
 	"btcRate/domain"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 )
 
@@ -22,7 +21,6 @@ func errorHandlingMiddleware() gin.HandlerFunc {
 					c.String(http.StatusConflict, e.Error())
 				default:
 					c.String(http.StatusInternalServerError, defaultErrorMessage)
-					log.Printf("ERROR: Internal server error, %v", e)
 				}
 			}
 		}
