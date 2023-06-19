@@ -21,11 +21,11 @@ func NewBinanceClient() *BinanceClient {
 	return &BinanceClient{client: http.DefaultClient, baseURL: baseUrl}
 }
 
-func (binanceClient *BinanceClient) GetRate(currency string, coin string) (float64, time.Time, error) {
+func (b *BinanceClient) GetRate(currency string, coin string) (float64, time.Time, error) {
 	path := fmt.Sprintf("/ticker/price?symbol=%s%s", coin, currency)
-	url := binanceClient.baseURL.String() + path
+	url := b.baseURL.String() + path
 
-	resp, err := binanceClient.client.Get(url)
+	resp, err := b.client.Get(url)
 	if err != nil || resp.StatusCode != http.StatusOK {
 		return 0.0, time.Time{}, &domain.EndpointInaccessibleError{Message: "Couldn't access the Binance endpoint"}
 	}

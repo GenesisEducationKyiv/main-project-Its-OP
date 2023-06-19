@@ -31,25 +31,25 @@ func NewFileEmailRepository() (*FileEmailRepository, error) {
 		}
 	}
 
-	repo := FileEmailRepository{Emails: emails}
-	return &repo, nil
+	r := FileEmailRepository{Emails: emails}
+	return &r, nil
 }
 
-func (repo *FileEmailRepository) AddEmail(email string) error {
-	if repo.Emails.Contains(email) {
+func (r *FileEmailRepository) AddEmail(email string) error {
+	if r.Emails.Contains(email) {
 		return &domain.DataConsistencyError{Message: fmt.Sprintf("Email address '%s' is already present in the database", email)}
 	}
 
-	repo.Emails.Add(email)
+	r.Emails.Add(email)
 	return nil
 }
 
-func (repo *FileEmailRepository) GetAll() []string {
+func (r *FileEmailRepository) GetAll() []string {
 	if !fileExists() {
 		return []string{}
 	}
 
-	values := repo.Emails.Values()
+	values := r.Emails.Values()
 
 	emailsArray := make([]string, len(values))
 	for i, value := range values {
@@ -59,8 +59,8 @@ func (repo *FileEmailRepository) GetAll() []string {
 	return emailsArray
 }
 
-func (repo *FileEmailRepository) Save() error {
-	data, err := repo.Emails.MarshalJSON()
+func (r *FileEmailRepository) Save() error {
+	data, err := r.Emails.MarshalJSON()
 	if err != nil {
 		dbError := &domain.DatabaseError{NestedError: err}
 		return dbError

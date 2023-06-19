@@ -17,12 +17,12 @@ func NewSendGridEmailClient(apiKey string, senderName string, senderEmail string
 	return &SendGridEmailClient{apiKey: apiKey, senderName: senderName, senderEmail: senderEmail}
 }
 
-func (emailClient *SendGridEmailClient) Send(recipients []string, htmlContent string) {
+func (s *SendGridEmailClient) Send(recipients []string, htmlContent string) {
 	if len(recipients) == 0 {
 		return
 	}
 
-	from := mail.NewEmail(emailClient.senderName, emailClient.senderEmail)
+	from := mail.NewEmail(s.senderName, s.senderEmail)
 	firstTo := mail.NewEmail("Rate Recipient", recipients[0])
 	subject := "Current BTC to UAH rate"
 	message := mail.NewSingleEmail(from, subject, firstTo, "", htmlContent)
@@ -33,7 +33,7 @@ func (emailClient *SendGridEmailClient) Send(recipients []string, htmlContent st
 		message.AddPersonalizations(personalization)
 	}
 
-	client := sendgrid.NewSendClient(emailClient.apiKey)
+	client := sendgrid.NewSendClient(s.apiKey)
 
 	response, err := client.Send(message)
 	if err != nil {
