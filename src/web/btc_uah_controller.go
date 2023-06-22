@@ -34,7 +34,7 @@ func RunBtcUahController() error {
 	var bitcoinClient = infrastructure.NewBinanceClient()
 	var sendgrid = sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
 	var emailClient = infrastructure.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
-	btcuahService = application.NewCoinService(bitcoinClient, emailClient, emailRepository)
+	btcuahService = application.NewCoinService([]string{currency}, []string{coin}, bitcoinClient, emailClient, emailRepository)
 
 	r := gin.Default()
 	r.Use(errorHandlingMiddleware())
