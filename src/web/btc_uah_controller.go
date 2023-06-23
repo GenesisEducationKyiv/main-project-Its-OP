@@ -5,10 +5,12 @@ import (
 	"btcRate/docs"
 	"btcRate/domain"
 	"btcRate/infrastructure"
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -25,10 +27,10 @@ const coin = "BTC"
 
 var btcuahService domain.ICoinService
 
-func RunBtcUahController() error {
-	var emailRepository, err = infrastructure.NewFileEmailRepository("./data/emails.json")
+func RunBtcUahController(storageFile string) (func() error, error) {
+	var emailRepository, err = infrastructure.NewFileEmailRepository(storageFile)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var bitcoinClient = infrastructure.NewBinanceClient()
@@ -48,12 +50,23 @@ func RunBtcUahController() error {
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	err = r.Run(":8080") // Run on port 8080
-	if err != nil {
-		return err
+
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: r,
 	}
 
-	return nil
+	go func() {
+		if err := server.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatalf("ListenAndServe(): %v", err)
+		}
+	}()
+
+	stop := func() error {
+		return server.Shutdown(context.Background())
+	}
+
+	return stop, nil
 }
 
 // @Summary Get current BTC to UAH rate
