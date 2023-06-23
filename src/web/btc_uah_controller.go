@@ -26,7 +26,7 @@ const coin = "BTC"
 var btcuahService domain.ICoinService
 
 func RunBtcUahController() error {
-	var emailRepository, err = infrastructure.NewFileEmailRepository()
+	var emailRepository, err = infrastructure.NewFileEmailRepository("./data/emails.json")
 	if err != nil {
 		return err
 	}

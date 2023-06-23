@@ -8,16 +8,15 @@ import (
 	"path/filepath"
 )
 
-const storageFile = "./data/emails.json"
-
 type FileEmailRepository struct {
-	Emails hashset.Set
+	Emails      hashset.Set
+	storageFile string
 }
 
-func NewFileEmailRepository() (*FileEmailRepository, error) {
+func NewFileEmailRepository(storageFile string) (*FileEmailRepository, error) {
 	emails := *hashset.New()
 
-	if fileExists() {
+	if fileExists(storageFile) {
 		data, err := os.ReadFile(storageFile)
 		if err != nil {
 			return nil, err
@@ -29,7 +28,7 @@ func NewFileEmailRepository() (*FileEmailRepository, error) {
 		}
 	}
 
-	r := FileEmailRepository{Emails: emails}
+	r := FileEmailRepository{Emails: emails, storageFile: storageFile}
 	return &r, nil
 }
 
@@ -43,7 +42,7 @@ func (r *FileEmailRepository) AddEmail(email string) error {
 }
 
 func (r *FileEmailRepository) GetAll() []string {
-	if !fileExists() {
+	if !fileExists(r.storageFile) {
 		return []string{}
 	}
 
@@ -63,8 +62,8 @@ func (r *FileEmailRepository) Save() error {
 		return err
 	}
 
-	if !fileExists() {
-		err = createFile(storageFile)
+	if !fileExists(r.storageFile) {
+		err = createFile(r.storageFile)
 		if err != nil {
 			return err
 		}
@@ -72,7 +71,7 @@ func (r *FileEmailRepository) Save() error {
 
 	permissionCode := 0644
 
-	err = os.WriteFile(storageFile, data, os.FileMode(permissionCode))
+	err = os.WriteFile(r.storageFile, data, os.FileMode(permissionCode))
 	if err != nil {
 		return err
 	}
@@ -80,8 +79,8 @@ func (r *FileEmailRepository) Save() error {
 	return nil
 }
 
-func fileExists() bool {
-	info, err := os.Stat(storageFile)
+func fileExists(filePath string) bool {
+	info, err := os.Stat(filePath)
 	if os.IsNotExist(err) {
 		return false
 	}
