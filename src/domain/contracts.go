@@ -7,5 +7,5 @@ type ICoinService interface {
 
 type ICampaignService interface {
 	Subscribe(email string) error
-	SendEmails(templates string) error
+	SendEmails(htmlBody string) error
 }

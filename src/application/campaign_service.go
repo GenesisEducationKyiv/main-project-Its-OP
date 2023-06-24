@@ -11,9 +11,11 @@ type IEmailClient interface {
 }
 
 type CampaignService struct {
+	emailRepository IEmailRepository
+	emailClient     IEmailClient
 }
 
-func (c *CoinService) Subscribe(email string) error {
+func (c *CampaignService) Subscribe(email string) error {
 	err := c.emailRepository.AddEmail(email)
 	if err != nil {
 		return err
@@ -27,4 +29,12 @@ func (c *CoinService) Subscribe(email string) error {
 	return nil
 }
 
-emails := c.emailRepository.GetAll()
+func (c *CampaignService) SendEmails(htmlBody string) error {
+	emails := c.emailRepository.GetAll()
+	err := c.emailClient.Send(emails, htmlBody)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
