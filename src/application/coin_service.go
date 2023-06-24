@@ -4,17 +4,22 @@ import (
 	"btcRate/domain"
 	"fmt"
 	"golang.org/x/exp/slices"
+	"time"
 )
+
+type ICoinClient interface {
+	GetRate(currency string, coin string) (float64, time.Time, error)
+}
 
 type CoinService struct {
 	supportedCurrencies []string
 	supportedCoins      []string
-	coinClient          domain.ICoinClient
+	coinClient          ICoinClient
 	emailClient         domain.IEmailClient
 	emailRepository     domain.IEmailRepository
 }
 
-func NewCoinService(supportedCurrencies []string, supportedCoins []string, client domain.ICoinClient, emailClient domain.IEmailClient, emailRepository domain.IEmailRepository) *CoinService {
+func NewCoinService(supportedCurrencies []string, supportedCoins []string, client ICoinClient, emailClient domain.IEmailClient, emailRepository domain.IEmailRepository) *CoinService {
 	return &CoinService{supportedCurrencies: supportedCurrencies, supportedCoins: supportedCoins, coinClient: client, emailClient: emailClient, emailRepository: emailRepository}
 }
 
