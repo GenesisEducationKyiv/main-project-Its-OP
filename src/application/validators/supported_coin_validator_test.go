@@ -16,5 +16,5 @@ func TestValidate_UnsupportedCoin(t *testing.T) {
 	// Assert
 	assert.NotNil(t, err)
 	assert.IsType(t, &domain.ArgumentError{}, err)
-	assert.Equal(t, "Coin DOGE is not supported", err.(domain.ArgumentError).Message)
+	assert.Equal(t, "coin DOGE is not supported", err.(*domain.ArgumentError).Message)
 }
