@@ -15,7 +15,7 @@ func (v *EmailValidator) Validate(email string) error {
 		return err
 	}
 	if !match {
-		return domain.ArgumentError{Message: "email is invalid"}
+		return &domain.ArgumentError{Message: "email is invalid"}
 	}
 
 	return nil

@@ -23,7 +23,12 @@ func NewCampaignService(repository IEmailRepository, client IEmailClient, emailV
 }
 
 func (c *CampaignService) Subscribe(email string) error {
-	err := c.emailRepository.AddEmail(email)
+	err := c.emailValidator.Validate(email)
+	if err != nil {
+		return err
+	}
+
+	err = c.emailRepository.AddEmail(email)
 	if err != nil {
 		return err
 	}
