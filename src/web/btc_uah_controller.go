@@ -2,6 +2,7 @@ package web
 
 import (
 	"btcRate/application"
+	"btcRate/application/validators"
 	"btcRate/docs"
 	"btcRate/domain"
 	"btcRate/infrastructure"
@@ -13,7 +14,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
 )
 
 // @title GSES2 BTC application API
@@ -38,8 +38,12 @@ func RunBtcUahController(storageFile string) (func() error, error) {
 	var sendgrid = sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
 	var emailClient = infrastructure.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
 
-	campaignService = application.NewCampaignService(emailRepository, emailClient)
-	btcuahService = application.NewCoinService([]string{currency}, []string{coin}, bitcoinClient, campaignService)
+	var emailValidator = &validators.EmailValidator{}
+	var supportedCoinValidator = validators.NewSupportedCoinValidator([]string{coin})
+	var supportedCurrencyValidator = validators.NewSupportedCurrencyValidator([]string{currency})
+
+	campaignService = application.NewCampaignService(emailRepository, emailClient, emailValidator)
+	btcuahService = application.NewCoinService(bitcoinClient, campaignService, supportedCoinValidator, supportedCurrencyValidator)
 
 	r := gin.Default()
 	r.Use(errorHandlingMiddleware())
@@ -101,18 +105,6 @@ func getRate(c *gin.Context) {
 // @Router /subscribe [post]
 func subscribe(c *gin.Context) {
 	email := c.PostForm("email")
-	if email == "" {
-		c.String(http.StatusBadRequest, "Email is required")
-		return
-	}
-
-	if valid, err := validateEmail(&email); err != nil {
-		_ = c.Error(err)
-		return
-	} else if !valid {
-		c.String(http.StatusBadRequest, "Email is invalid")
-		return
-	}
 
 	err := campaignService.Subscribe(email)
 	if err != nil {
@@ -137,14 +129,4 @@ func sendEmails(c *gin.Context) {
 	}
 
 	c.String(http.StatusOK, "E-mails sent")
-}
-
-func validateEmail(email *string) (bool, error) {
-	regexString := "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-	match, err := regexp.Match(regexString, []byte(*email))
-	if err != nil {
-		return false, err
-	}
-
-	return match, nil
 }
