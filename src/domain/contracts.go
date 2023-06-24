@@ -11,5 +11,5 @@ type ICampaignService interface {
 }
 
 type IValidator[T any] interface {
-	Validate(T) (bool, error)
+	Validate(T) error
 }

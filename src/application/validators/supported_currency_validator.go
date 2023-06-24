@@ -1,6 +1,9 @@
 package validators
 
-import "golang.org/x/exp/slices"
+import (
+	"fmt"
+	"golang.org/x/exp/slices"
+)
 
 type SupportedCurrencyValidator struct {
 	supportedCurrencies []string
@@ -10,6 +13,10 @@ func NewSupportedCurrencyValidator(supportedCurrencies []string) *SupportedCurre
 	return &SupportedCurrencyValidator{supportedCurrencies: supportedCurrencies}
 }
 
-func (v *SupportedCurrencyValidator) Validate(currency string) (bool, error) {
-	return slices.Contains(v.supportedCurrencies, currency), nil
+func (v *SupportedCurrencyValidator) Validate(currency string) error {
+	if slices.Contains(v.supportedCurrencies, currency) {
+		return fmt.Errorf("currency %s is not supported", currency)
+	}
+
+	return nil
 }
