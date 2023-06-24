@@ -15,7 +15,7 @@ func NewSupportedCoinValidator(supportedCoins []string) *SupportedCoinValidator 
 }
 
 func (v *SupportedCoinValidator) Validate(coin string) error {
-	if slices.Contains(v.supportedCoins, coin) {
+	if !slices.Contains(v.supportedCoins, coin) {
 		return &domain.ArgumentError{Message: fmt.Sprintf("coin %s is not supported", coin)}
 	}
 

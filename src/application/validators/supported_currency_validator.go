@@ -15,7 +15,7 @@ func NewSupportedCurrencyValidator(supportedCurrencies []string) *SupportedCurre
 }
 
 func (v *SupportedCurrencyValidator) Validate(currency string) error {
-	if slices.Contains(v.supportedCurrencies, currency) {
+	if !slices.Contains(v.supportedCurrencies, currency) {
 		return &domain.ArgumentError{Message: fmt.Sprintf("currency %s is not supported", currency)}
 	}
 
