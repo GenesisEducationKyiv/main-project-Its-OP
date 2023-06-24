@@ -9,3 +9,7 @@ type ICampaignService interface {
 	Subscribe(email string) error
 	SendEmails(htmlBody string) error
 }
+
+type IValidator[T any] interface {
+	Validate(T) (bool, error)
+}
