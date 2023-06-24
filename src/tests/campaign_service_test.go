@@ -2,6 +2,7 @@ package tests
 
 import (
 	"btcRate/application"
+	"btcRate/application/validators"
 	"btcRate/domain"
 	"btcRate/infrastructure"
 	"github.com/stretchr/testify/assert"
@@ -11,9 +12,10 @@ import (
 
 const storageFile = "artifacts/emails.json"
 
-func setup() *application.CoinService {
+func setup() *application.CampaignService {
 	emailRepo, _ := infrastructure.NewFileEmailRepository(storageFile)
-	service := application.NewCoinService(nil, nil, nil, nil, emailRepo)
+	emailValidator := &validators.EmailValidator{}
+	service := application.NewCampaignService(emailRepo, nil, emailValidator)
 
 	return service
 }
