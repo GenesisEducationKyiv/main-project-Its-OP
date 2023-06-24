@@ -1,5 +1,7 @@
 package application
 
+import "btcRate/domain"
+
 type IEmailRepository interface {
 	AddEmail(email string) error
 	GetAll() []string
@@ -13,10 +15,11 @@ type IEmailClient interface {
 type CampaignService struct {
 	emailRepository IEmailRepository
 	emailClient     IEmailClient
+	emailValidator  domain.IValidator[string]
 }
 
-func NewCampaignService(repository IEmailRepository, client IEmailClient) *CampaignService {
-	return &CampaignService{emailRepository: repository, emailClient: client}
+func NewCampaignService(repository IEmailRepository, client IEmailClient, emailValidator domain.IValidator[string]) *CampaignService {
+	return &CampaignService{emailRepository: repository, emailClient: client, emailValidator: emailValidator}
 }
 
 func (c *CampaignService) Subscribe(email string) error {

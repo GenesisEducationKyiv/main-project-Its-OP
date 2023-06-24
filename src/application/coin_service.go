@@ -3,7 +3,6 @@ package application
 import (
 	"btcRate/domain"
 	"fmt"
-	"golang.org/x/exp/slices"
 	"time"
 )
 
@@ -12,23 +11,20 @@ type ICoinClient interface {
 }
 
 type CoinService struct {
-	supportedCurrencies []string
-	supportedCoins      []string
-	coinClient          ICoinClient
-	campaignService     domain.ICampaignService
+	coinClient        ICoinClient
+	campaignService   domain.ICampaignService
+	coinValidator     domain.IValidator[string]
+	currencyValidator domain.IValidator[string]
 }
 
-func NewCoinService(supportedCurrencies []string, supportedCoins []string, client ICoinClient, campaignService domain.ICampaignService) *CoinService {
-	return &CoinService{supportedCurrencies: supportedCurrencies, supportedCoins: supportedCoins, coinClient: client, campaignService: campaignService}
+func NewCoinService(client ICoinClient, campaignService domain.ICampaignService, coinValidator domain.IValidator[string], currencyValidator domain.IValidator[string]) *CoinService {
+	return &CoinService{coinClient: client, campaignService: campaignService, coinValidator: coinValidator, currencyValidator: currencyValidator}
 }
 
 func (c *CoinService) GetCurrentRate(currency string, coin string) (*domain.Price, error) {
-	if !c.validateCurrency(currency) {
-		return nil, domain.ArgumentError{Message: fmt.Sprintf("Currency %s is not supported", currency)}
-	}
-
-	if !c.validateCoin(coin) {
-		return nil, domain.ArgumentError{Message: fmt.Sprintf("Coin %s is not supported", coin)}
+	err := c.validateParameters(currency, coin)
+	if err != nil {
+		return nil, err
 	}
 
 	rate, time, err := c.coinClient.GetRate(currency, coin)
@@ -45,12 +41,9 @@ func (c *CoinService) GetCurrentRate(currency string, coin string) (*domain.Pric
 }
 
 func (c *CoinService) SendRateEmails(currency string, coin string) error {
-	if !c.validateCurrency(currency) {
-		return domain.ArgumentError{Message: fmt.Sprintf("Currency %s is not supported", currency)}
-	}
-
-	if !c.validateCoin(coin) {
-		return domain.ArgumentError{Message: fmt.Sprintf("Coin %s is not supported", coin)}
+	err := c.validateParameters(currency, coin)
+	if err != nil {
+		return err
 	}
 
 	currentPrice, err := c.GetCurrentRate(currency, coin)
@@ -71,10 +64,16 @@ func (c *CoinService) SendRateEmails(currency string, coin string) error {
 	return nil
 }
 
-func (c *CoinService) validateCurrency(currency string) bool {
-	return slices.Contains(c.supportedCurrencies, currency)
-}
+func (c *CoinService) validateParameters(currency string, coin string) error {
+	err := c.currencyValidator.Validate(currency)
+	if err != nil {
+		return err
+	}
 
-func (c *CoinService) validateCoin(coin string) bool {
-	return slices.Contains(c.supportedCoins, coin)
+	err = c.coinValidator.Validate(coin)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
