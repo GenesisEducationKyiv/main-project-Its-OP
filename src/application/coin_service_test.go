@@ -22,7 +22,7 @@ func setup() (*CoinService, *TestCoinClient) {
 	supportedCurrencies := []string{"UAH", "USD"}
 	supportedCoins := []string{"BTC", "ETH"}
 
-	service := NewCoinService(supportedCurrencies, supportedCoins, coinClient, nil, nil)
+	service := NewCoinService(supportedCurrencies, supportedCoins, coinClient, nil)
 
 	return service, coinClient
 }

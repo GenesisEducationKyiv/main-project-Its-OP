@@ -26,6 +26,7 @@ const currency = "UAH"
 const coin = "BTC"
 
 var btcuahService domain.ICoinService
+var campaignService domain.ICampaignService
 
 func RunBtcUahController(storageFile string) (func() error, error) {
 	var emailRepository, err = infrastructure.NewFileEmailRepository(storageFile)
@@ -36,7 +37,9 @@ func RunBtcUahController(storageFile string) (func() error, error) {
 	var bitcoinClient = infrastructure.NewBinanceClient()
 	var sendgrid = sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
 	var emailClient = infrastructure.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
-	btcuahService = application.NewCoinService([]string{currency}, []string{coin}, bitcoinClient, emailClient, emailRepository)
+
+	campaignService = application.NewCampaignService(emailRepository, emailClient)
+	btcuahService = application.NewCoinService([]string{currency}, []string{coin}, bitcoinClient, campaignService)
 
 	r := gin.Default()
 	r.Use(errorHandlingMiddleware())
@@ -111,7 +114,7 @@ func subscribe(c *gin.Context) {
 		return
 	}
 
-	err := btcuahService.Subscribe(email)
+	err := campaignService.Subscribe(email)
 	if err != nil {
 		_ = c.Error(err)
 		return

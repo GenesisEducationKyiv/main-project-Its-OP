@@ -15,6 +15,10 @@ type CampaignService struct {
 	emailClient     IEmailClient
 }
 
+func NewCampaignService(repository IEmailRepository, client IEmailClient) *CampaignService {
+	return &CampaignService{emailRepository: repository, emailClient: client}
+}
+
 func (c *CampaignService) Subscribe(email string) error {
 	err := c.emailRepository.AddEmail(email)
 	if err != nil {
