@@ -1,6 +1,7 @@
 package validators
 
 import (
+	"btcRate/domain"
 	"fmt"
 	"golang.org/x/exp/slices"
 )
@@ -15,7 +16,7 @@ func NewSupportedCoinValidator(supportedCoins []string) *SupportedCoinValidator 
 
 func (v *SupportedCoinValidator) Validate(coin string) error {
 	if slices.Contains(v.supportedCoins, coin) {
-		return fmt.Errorf("coin %s is not supported", coin)
+		return domain.ArgumentError{Message: fmt.Sprintf("coin %s is not supported", coin)}
 	}
 
 	return nil
