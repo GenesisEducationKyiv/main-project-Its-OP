@@ -15,12 +15,11 @@ type CoinService struct {
 	supportedCurrencies []string
 	supportedCoins      []string
 	coinClient          ICoinClient
-	emailClient         domain.IEmailClient
-	emailRepository     domain.IEmailRepository
+	campaignService     domain.ICampaignService
 }
 
-func NewCoinService(supportedCurrencies []string, supportedCoins []string, client ICoinClient, emailClient domain.IEmailClient, emailRepository domain.IEmailRepository) *CoinService {
-	return &CoinService{supportedCurrencies: supportedCurrencies, supportedCoins: supportedCoins, coinClient: client, emailClient: emailClient, emailRepository: emailRepository}
+func NewCoinService(supportedCurrencies []string, supportedCoins []string, client ICoinClient, campaignService domain.ICampaignService) *CoinService {
+	return &CoinService{supportedCurrencies: supportedCurrencies, supportedCoins: supportedCoins, coinClient: client, campaignService: campaignService}
 }
 
 func (c *CoinService) GetCurrentRate(currency string, coin string) (*domain.Price, error) {
@@ -45,20 +44,6 @@ func (c *CoinService) GetCurrentRate(currency string, coin string) (*domain.Pric
 	}, nil
 }
 
-func (c *CoinService) Subscribe(email string) error {
-	err := c.emailRepository.AddEmail(email)
-	if err != nil {
-		return err
-	}
-
-	err = c.emailRepository.Save()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (c *CoinService) SendRateEmails(currency string, coin string) error {
 	if !c.validateCurrency(currency) {
 		return domain.ArgumentError{Message: fmt.Sprintf("Currency %s is not supported", currency)}
@@ -67,8 +52,6 @@ func (c *CoinService) SendRateEmails(currency string, coin string) error {
 	if !c.validateCoin(coin) {
 		return domain.ArgumentError{Message: fmt.Sprintf("Coin %s is not supported", coin)}
 	}
-
-	emails := c.emailRepository.GetAll()
 
 	currentPrice, err := c.GetCurrentRate(currency, coin)
 	if err != nil {
@@ -80,7 +63,7 @@ func (c *CoinService) SendRateEmails(currency string, coin string) error {
 	<p><strong>Timestamp:</strong> %s<p>`
 	htmlBody := fmt.Sprintf(htmlTemplate, currentPrice.Amount, currentPrice.Currency, currentPrice.Timestamp.Format("02-01-06 15:04:05.999 Z0700"))
 
-	err = c.emailClient.Send(emails, htmlBody)
+	err = c.campaignService.SendEmails(htmlBody)
 	if err != nil {
 		return err
 	}

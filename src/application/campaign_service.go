@@ -12,3 +12,19 @@ type IEmailClient interface {
 
 type CampaignService struct {
 }
+
+func (c *CoinService) Subscribe(email string) error {
+	err := c.emailRepository.AddEmail(email)
+	if err != nil {
+		return err
+	}
+
+	err = c.emailRepository.Save()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+emails := c.emailRepository.GetAll()
