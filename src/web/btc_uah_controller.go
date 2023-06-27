@@ -20,10 +20,11 @@ import (
 // @host localhost:8080
 // @BasePath /api
 
-const currency = "UAH"
-const coin = "BTC"
-
-var btcuahService domain.ICoinService
+type btcUahController struct {
+	service  domain.ICoinService
+	currency string
+	coin     string
+}
 
 func RunBtcUahController() error {
 	var emailRepository, err = infrastructure.NewFileEmailRepository()
@@ -34,7 +35,9 @@ func RunBtcUahController() error {
 	var bitcoinClient = infrastructure.NewBinanceClient()
 	var sendgrid = sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
 	var emailClient = infrastructure.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
-	btcuahService = application.NewCoinService(bitcoinClient, emailClient, emailRepository)
+	var btcUahService = application.NewCoinService(bitcoinClient, emailClient, emailRepository)
+
+	controller := btcUahController{service: btcUahService, currency: "UAH", coin: "BTC"}
 
 	r := gin.Default()
 	r.Use(errorHandlingMiddleware())
@@ -42,9 +45,9 @@ func RunBtcUahController() error {
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	api := r.Group("/api/v1")
 	{
-		api.GET("/rate", getRate)
-		api.POST("/subscribe", subscribe)
-		api.POST("/sendEmails", sendEmails)
+		api.GET("/rate", controller.getRate)
+		api.POST("/subscribe", controller.subscribe)
+		api.POST("/sendEmails", controller.sendEmails)
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
@@ -63,15 +66,15 @@ func RunBtcUahController() error {
 // @Success 200 {number} number "Successful operation"
 // @Failure 400 {object} string "Invalid status value"
 // @Router /rate [get]
-func getRate(c *gin.Context) {
-	price, err := btcuahService.GetCurrentRate(currency, coin)
+func (c *btcUahController) getRate(context *gin.Context) {
+	price, err := c.service.GetCurrentRate(c.currency, c.coin)
 
 	if err != nil {
-		_ = c.Error(err)
+		_ = context.Error(err)
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, price.Amount)
+	context.IndentedJSON(http.StatusOK, price.Amount)
 }
 
 // @Summary Subscribe email to get BTC rate
@@ -83,28 +86,28 @@ func getRate(c *gin.Context) {
 // @Success 200 {object} string "E-mail added"
 // @Failure 409 {object} string "E-mail already exists in the database"
 // @Router /subscribe [post]
-func subscribe(c *gin.Context) {
-	email := c.PostForm("email")
+func (c *btcUahController) subscribe(context *gin.Context) {
+	email := context.PostForm("email")
 	if email == "" {
-		c.String(http.StatusBadRequest, "Email is required")
+		context.String(http.StatusBadRequest, "Email is required")
 		return
 	}
 
 	if valid, err := validateEmail(&email); err != nil {
-		_ = c.Error(err)
+		_ = context.Error(err)
 		return
 	} else if !valid {
-		c.String(http.StatusBadRequest, "Email is invalid")
+		context.String(http.StatusBadRequest, "Email is invalid")
 		return
 	}
 
-	err := btcuahService.Subscribe(email)
+	err := c.service.Subscribe(email)
 	if err != nil {
-		_ = c.Error(err)
+		_ = context.Error(err)
 		return
 	}
 
-	c.String(http.StatusOK, "E-mail address added")
+	context.String(http.StatusOK, "E-mail address added")
 }
 
 // @Summary Send email with BTC rate
@@ -113,14 +116,14 @@ func subscribe(c *gin.Context) {
 // @Produce  json
 // @Success 200 {object} string "E-mails sent"
 // @Router /sendEmails [post]
-func sendEmails(c *gin.Context) {
-	err := btcuahService.SendRateEmails(currency, coin)
+func (c *btcUahController) sendEmails(context *gin.Context) {
+	err := c.service.SendRateEmails(c.currency, c.coin)
 	if err != nil {
-		_ = c.Error(err)
+		_ = context.Error(err)
 		return
 	}
 
-	c.String(http.StatusOK, "E-mails sent")
+	context.String(http.StatusOK, "E-mails sent")
 }
 
 func validateEmail(email *string) (bool, error) {
