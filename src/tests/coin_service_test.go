@@ -51,6 +51,5 @@ func TestSubscribe_Duplicate(t *testing.T) {
 
 	// Assert
 	assert.NotNil(t, err)
-	assert.IsType(t, &domain.DataConsistencyError{}, err)
 	assert.Equal(t, "Email address 'test@example.com' is already present in the database", err.(*domain.DataConsistencyError).Message)
 }
