@@ -61,7 +61,13 @@ func (*ServerManager) RunServer(storageFile string) (func() error, error) {
 
 func (s *ServerManager) GetRate(host string) (*Response[int], error) {
 	url := host + apiBasePath + getRate
-	body, statusCode, err := s.sendRequest(url)
+	
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, statusCode, err := s.sendRequest(req)
 	if err != nil {
 		return nil, err
 	}
@@ -78,8 +84,9 @@ func (s *ServerManager) GetRate(host string) (*Response[int], error) {
 	return &Response[int]{Code: statusCode, ErrorMessage: string(body), Successful: false}, nil
 }
 
-func (*ServerManager) sendRequest(url string) ([]byte, int, error) {
-	resp, err := http.Get(url)
+func (*ServerManager) sendRequest(req *http.Request) ([]byte, int, error) {
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, 0, err
 	}
