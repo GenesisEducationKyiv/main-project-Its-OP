@@ -56,12 +56,17 @@ func TestGetCurrentRate_UnsupportedCoin(t *testing.T) {
 func TestGetCurrentRate_Success(t *testing.T) {
 	// Arrange
 	service, client := setup()
-	client.On("GetRate", "USD", "BTC").Return(31000.0, time.Now(), nil)
+	currency := "USD"
+	coin := "BTC"
+	timestamp := time.Now()
+	expectedPrice := domain.Price{Amount: 31000, Currency: currency, Timestamp: timestamp}
+	client.On("GetRate", currency, coin).Return(expectedPrice.Amount, timestamp, nil)
 
 	// Act
-	_, err := service.GetCurrentRate("USD", "BTC")
+	price, err := service.GetCurrentRate(currency, coin)
 
 	// Assert
+	assert.Equal(t, &expectedPrice, price)
 	assert.Nil(t, err)
-	client.AssertCalled(t, "GetRate", "USD", "BTC")
+	client.AssertCalled(t, "GetRate", currency, coin)
 }

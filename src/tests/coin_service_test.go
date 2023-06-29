@@ -42,9 +42,7 @@ func TestSubscribe_Duplicate(t *testing.T) {
 	defer teardown(t)
 	service := setup()
 	err := service.Subscribe("test@example.com")
-	if err != nil {
-		t.Errorf("%e", err)
-	}
+	assert.Nil(t, err)
 
 	// Act
 	err = service.Subscribe("test@example.com")
