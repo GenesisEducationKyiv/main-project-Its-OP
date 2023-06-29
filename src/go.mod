@@ -11,6 +11,7 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.1
+	github.com/vektra/mockery v1.1.2
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 )
 

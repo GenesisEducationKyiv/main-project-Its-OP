@@ -3,22 +3,12 @@ package application
 import (
 	"btcRate/domain"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"testing"
 	"time"
 )
 
-type TestCoinClient struct {
-	mock.Mock
-}
-
-func (m *TestCoinClient) GetRate(currency string, coin string) (float64, time.Time, error) {
-	args := m.Called(currency, coin)
-	return args.Get(0).(float64), args.Get(1).(time.Time), args.Error(2)
-}
-
-func setup() (*CoinService, *TestCoinClient) {
-	coinClient := &TestCoinClient{}
+func setup(t *testing.T) (*CoinService, *MockICoinClient) {
+	coinClient := NewMockICoinClient(t)
 	supportedCurrencies := []string{"UAH", "USD"}
 	supportedCoins := []string{"BTC", "ETH"}
 
@@ -29,7 +19,7 @@ func setup() (*CoinService, *TestCoinClient) {
 
 func TestGetCurrentRate_UnsupportedCurrency(t *testing.T) {
 	// Arrange
-	service, _ := setup()
+	service, _ := setup(t)
 
 	// Act
 	price, err := service.GetCurrentRate("GBP", "BTC")
@@ -42,7 +32,7 @@ func TestGetCurrentRate_UnsupportedCurrency(t *testing.T) {
 
 func TestGetCurrentRate_UnsupportedCoin(t *testing.T) {
 	// Arrange
-	service, _ := setup()
+	service, _ := setup(t)
 
 	// Act
 	price, err := service.GetCurrentRate("UAH", "DOGE")
@@ -55,12 +45,12 @@ func TestGetCurrentRate_UnsupportedCoin(t *testing.T) {
 
 func TestGetCurrentRate_Success(t *testing.T) {
 	// Arrange
-	service, client := setup()
+	service, client := setup(t)
 	currency := "USD"
 	coin := "BTC"
 	timestamp := time.Now()
 	expectedPrice := domain.Price{Amount: 31000, Currency: currency, Timestamp: timestamp}
-	client.On("GetRate", currency, coin).Return(expectedPrice.Amount, timestamp, nil)
+	client.EXPECT().GetRate(currency, coin).Return(expectedPrice.Amount, timestamp, nil)
 
 	// Act
 	price, err := service.GetCurrentRate(currency, coin)
