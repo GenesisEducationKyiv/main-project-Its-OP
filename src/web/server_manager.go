@@ -25,9 +25,9 @@ func (*ServerManager) RunServer(storageFile string) (func() error, error) {
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	api := r.Group("/api/v1")
 	{
-		api.GET("/rate", btcUahController.getRate)
-		api.POST("/subscribe", btcUahController.subscribe)
-		api.POST("/sendEmails", btcUahController.sendEmails)
+		api.GET(getRate, btcUahController.getRate)
+		api.POST(subscribe, btcUahController.subscribe)
+		api.POST(sendEmails, btcUahController.sendEmails)
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
