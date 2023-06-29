@@ -74,7 +74,7 @@ func (s *ServerManager) GetRate(host string) (*Response[int], error) {
 		}
 		return &Response[int]{Code: statusCode, Body: &result, ErrorMessage: "", Successful: true}, nil
 	}
-	
+
 	return &Response[int]{Code: statusCode, ErrorMessage: string(body), Successful: false}, nil
 }
 

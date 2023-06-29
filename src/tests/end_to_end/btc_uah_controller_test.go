@@ -2,16 +2,13 @@ package end_to_end
 
 import (
 	"btcRate/web"
-	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
-	"io"
 	"net/http"
 	"testing"
 	"time"
 )
 
-func TestRateApi(t *testing.T) {
-	// Arrange
+func setup(t *testing.T) (*web.ServerManager, func()) {
 	server := web.ServerManager{}
 	stop, err := server.RunServer("./data/emails.json")
 	if err != nil {
@@ -19,31 +16,24 @@ func TestRateApi(t *testing.T) {
 	}
 	time.Sleep(2 * time.Second)
 
-	defer func() {
+	return nil, func() {
 		if err := stop(); err != nil {
 			t.Fatal("unable to stop the server")
 		}
-	}()
+	}
+}
+
+func TestRateApi(t *testing.T) {
+	// Arrange
+	server, stop := setup(t)
+	defer stop()
 
 	// Act
-	resp, err := http.Get("http://localhost:8080/api/v1/rate")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			t.Error("failed to close response body")
-		}
-	}(resp.Body)
-
-	var price int
-	err = json.NewDecoder(resp.Body).Decode(&price)
-	if err != nil {
-		t.Fatal(err)
-	}
+	resp, err := server.GetRate("http://localhost:8080")
 
 	// Assert
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	assert.NotEmpty(t, price)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.Code)
+	assert.True(t, resp.Successful)
+	assert.True(t, *resp.Body > 0)
 }
