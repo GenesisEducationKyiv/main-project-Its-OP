@@ -61,8 +61,8 @@ func (*ServerManager) RunServer(storageFile string) (func() error, error) {
 
 func (s *ServerManager) GetRate(host string) (*Response[int], error) {
 	url := host + apiBasePath + getRate
-	
-	req, err := http.NewRequest("GET", url, nil)
+
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
