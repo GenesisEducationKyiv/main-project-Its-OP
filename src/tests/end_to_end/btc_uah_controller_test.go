@@ -1,5 +1,3 @@
-//go:build endToEnd
-
 package end_to_end
 
 import (
@@ -14,7 +12,8 @@ import (
 
 func TestRateApi(t *testing.T) {
 	// Arrange
-	stop, err := web.RunBtcUahController("./data/emails.json")
+	server := web.ServerManager{}
+	stop, err := server.RunServer("./data/emails.json")
 	if err != nil {
 		t.Fatal("unable to start the server")
 	}

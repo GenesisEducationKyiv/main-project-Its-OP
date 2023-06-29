@@ -8,7 +8,8 @@ import (
 )
 
 func main() {
-	stop, err := web.RunBtcUahController("./data/emails.json")
+	server := web.ServerManager{}
+	stop, err := server.RunServer("./data/emails.json")
 	if err != nil {
 		log.Fatal(err)
 	}
