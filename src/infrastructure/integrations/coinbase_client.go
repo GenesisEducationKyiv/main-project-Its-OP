@@ -1,6 +1,7 @@
 package integrations
 
 import (
+	"btcRate/application"
 	"btcRate/domain"
 	"encoding/json"
 	"fmt"
@@ -13,6 +14,7 @@ import (
 type CoinbaseClient struct {
 	client  IExtendedHttpClient
 	baseURL *url.URL
+	next    application.ICoinClient
 }
 
 func NewCoinbaseClient(client IExtendedHttpClient) *CoinbaseClient {
@@ -31,6 +33,10 @@ func (c *CoinbaseClient) GetRate(currency string, coin string) (float64, time.Ti
 
 	respBody, code, err := c.client.SendRequest(req)
 	if err != nil || code != http.StatusOK {
+		if c.next != nil {
+			return c.next.GetRate(currency, coin)
+		}
+
 		return 0.0, time.Time{}, &domain.EndpointInaccessibleError{Message: "Couldn't access the Coinbase endpoint"}
 	}
 
@@ -39,7 +45,11 @@ func (c *CoinbaseClient) GetRate(currency string, coin string) (float64, time.Ti
 	var result coinbaseResponse
 	err = json.Unmarshal(respBody, &result)
 	if err != nil {
-		return 0.0, time.Time{}, err
+		if c.next != nil {
+			return c.next.GetRate(currency, coin)
+		}
+
+		return 0, time.Time{}, err
 	}
 
 	price, err := strconv.ParseFloat(result.Data.Amount, 64)
@@ -48,6 +58,10 @@ func (c *CoinbaseClient) GetRate(currency string, coin string) (float64, time.Ti
 	}
 
 	return price, timestamp, nil
+}
+
+func (b *CoinbaseClient) SetNext(client application.ICoinClient) {
+	b.next = client
 }
 
 type coinbaseResponse struct {

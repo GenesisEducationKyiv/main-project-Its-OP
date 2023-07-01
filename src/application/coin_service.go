@@ -12,6 +12,7 @@ type ICoinClientFactory interface {
 
 type ICoinClient interface {
 	GetRate(currency string, coin string) (float64, time.Time, error)
+	SetNext(client ICoinClient)
 }
 
 type CoinService struct {
