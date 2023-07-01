@@ -2,17 +2,22 @@ package web
 
 import (
 	"btcRate/docs"
+	"btcRate/infrastructure"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"io"
 	"log"
 	"net/http"
 )
 
+type IExtendedHttpClient interface {
+	SendRequest(req *http.Request) ([]byte, int, error)
+}
+
 type ServerManager struct {
+	client IExtendedHttpClient
 }
 
 type Response[T any] struct {
@@ -20,6 +25,10 @@ type Response[T any] struct {
 	Body         *T
 	ErrorMessage string
 	Successful   bool
+}
+
+func NewServerManager() ServerManager {
+	return ServerManager{infrastructure.NewExtendedHttpClient(nil)}
 }
 
 func (*ServerManager) RunServer(storageFile string) (func() error, error) {
@@ -67,7 +76,7 @@ func (s *ServerManager) GetRate(host string) (*Response[int], error) {
 		return nil, err
 	}
 
-	body, statusCode, err := s.sendRequest(req)
+	body, statusCode, err := s.client.SendRequest(req)
 	if err != nil {
 		return nil, err
 	}
@@ -82,25 +91,6 @@ func (s *ServerManager) GetRate(host string) (*Response[int], error) {
 	}
 
 	return &Response[int]{Code: statusCode, ErrorMessage: string(body), Successful: false}, nil
-}
-
-func (*ServerManager) sendRequest(req *http.Request) ([]byte, int, error) {
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	if err = resp.Body.Close(); err != nil {
-		return nil, 0, err
-	}
-
-	return body, resp.StatusCode, nil
 }
 
 func isSuccessful(code int) bool {

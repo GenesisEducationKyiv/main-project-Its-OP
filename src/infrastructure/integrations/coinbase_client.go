@@ -4,7 +4,6 @@ import (
 	"btcRate/domain"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -12,30 +11,30 @@ import (
 )
 
 type CoinbaseClient struct {
-	client  *http.Client
+	client  IExtendedHttpClient
 	baseURL *url.URL
 }
 
-func NewCoinbaseClient() *CoinbaseClient {
+func NewCoinbaseClient(client IExtendedHttpClient) *CoinbaseClient {
 	baseUrl := &url.URL{Scheme: "https", Host: "api.coinbase.com", Path: "/v2"}
-	return &CoinbaseClient{client: http.DefaultClient, baseURL: baseUrl}
+	return &CoinbaseClient{client: client, baseURL: baseUrl}
 }
 
 func (c *CoinbaseClient) GetRate(currency string, coin string) (float64, time.Time, error) {
 	path := fmt.Sprintf("/prices/%s-%s/spot", coin, currency)
 	url := c.baseURL.String() + path
 
-	resp, err := c.client.Get(url)
-	if err != nil || resp.StatusCode != http.StatusOK {
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return 0, time.Time{}, err
+	}
+
+	respBody, code, err := c.client.SendRequest(req)
+	if err != nil || code != http.StatusOK {
 		return 0.0, time.Time{}, &domain.EndpointInaccessibleError{Message: "Couldn't access the Coinbase endpoint"}
 	}
 
 	timestamp := time.Now()
-
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return 0.0, time.Time{}, err
-	}
 
 	var result coinbaseResponse
 	err = json.Unmarshal(respBody, &result)

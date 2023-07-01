@@ -4,7 +4,6 @@ import (
 	"btcRate/domain"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -12,40 +11,40 @@ import (
 )
 
 type BinanceClient struct {
-	client  *http.Client
+	client  IExtendedHttpClient
 	baseURL *url.URL
 }
 
-func NewBinanceClient() *BinanceClient {
+func NewBinanceClient(client IExtendedHttpClient) *BinanceClient {
 	baseUrl := &url.URL{Scheme: "https", Host: "api.binance.com", Path: "/api/v3"}
-	return &BinanceClient{client: http.DefaultClient, baseURL: baseUrl}
+	return &BinanceClient{client: client, baseURL: baseUrl}
 }
 
 func (b *BinanceClient) GetRate(currency string, coin string) (float64, time.Time, error) {
 	path := fmt.Sprintf("/ticker/price?symbol=%s%s", coin, currency)
 	url := b.baseURL.String() + path
 
-	resp, err := b.client.Get(url)
-	if err != nil || resp.StatusCode != http.StatusOK {
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return 0, time.Time{}, err
+	}
+
+	respBody, code, err := b.client.SendRequest(req)
+	if err != nil || code != http.StatusOK {
 		return 0.0, time.Time{}, &domain.EndpointInaccessibleError{Message: "Couldn't access the Binance endpoint"}
 	}
 
 	timestamp := time.Now()
 
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return 0.0, time.Time{}, err
-	}
-
 	var result binanceResponse
 	err = json.Unmarshal(respBody, &result)
 	if err != nil {
-		return 0.0, time.Time{}, err
+		return 0, time.Time{}, err
 	}
 
 	price, err := strconv.ParseFloat(result.Price, 64)
 	if err != nil {
-		return 0.0, time.Time{}, err
+		return 0, time.Time{}, err
 	}
 
 	return price, timestamp, nil
