@@ -43,7 +43,7 @@ func newBtcUahController(storageFile string) (*btcUahController, error) {
 
 	var campaignService = application.NewCampaignService(emailRepository, emailClient, emailValidator)
 
-	var btcUahService = application.NewCoinService(bitcoinClient, campaignService, supportedCurrencyValidator, supportedCoinValidator)
+	var btcUahService = application.NewCoinService(bitcoinClient, campaignService, supportedCoinValidator, supportedCurrencyValidator)
 
 	controller := &btcUahController{coinService: btcUahService, campaignService: campaignService, currency: supportedCurrency, coin: supportedCoin}
 
