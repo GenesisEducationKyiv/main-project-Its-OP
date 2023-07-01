@@ -4,9 +4,9 @@ import (
 	"btcRate/application"
 	"btcRate/application/validators"
 	"btcRate/domain"
-	"btcRate/infrastructure"
 	"btcRate/infrastructure/factories"
 	"btcRate/infrastructure/integrations"
+	"btcRate/infrastructure/repositories"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
 	"net/http"
@@ -30,7 +30,7 @@ func newBtcUahController(storageFile string) (*btcUahController, error) {
 	supportedCurrency := "UAH"
 	supportedCoin := "BTC"
 
-	var emailRepository, err = infrastructure.NewFileEmailRepository(storageFile)
+	var emailRepository, err = repositories.NewFileEmailRepository(storageFile)
 	if err != nil {
 		return nil, err
 	}

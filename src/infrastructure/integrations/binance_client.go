@@ -33,7 +33,7 @@ func (b *BinanceClient) GetRate(currency string, coin string) (float64, time.Tim
 	}
 
 	resp, err := b.client.SendRequest(req)
-	if err != nil || resp.Code != http.StatusOK {
+	if err == nil || resp.Code != http.StatusOK {
 		if b.next != nil {
 			return b.next.GetRate(currency, coin)
 		}
