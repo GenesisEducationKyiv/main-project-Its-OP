@@ -30,7 +30,7 @@ func (c *LoggedHttpClient) SendRequest(req *http.Request) (*infrastructure.HttpR
 		return nil, err
 	}
 
-	logMessage := fmt.Sprintf("%s,%s,%d,%s", timestamp.Format("02-01-06 15:04:05.999 Z0700"), url, resp.Code, string(resp.Body))
+	logMessage := fmt.Sprintf("%s,%s,%d,'%s'", timestamp.Format("02-01-06 15:04:05.999 Z0700"), url, resp.Code, string(resp.Body))
 
 	err = c.repository.Log(logMessage)
 
