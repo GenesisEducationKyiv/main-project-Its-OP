@@ -44,15 +44,12 @@ func TestSubscribe_Duplicate(t *testing.T) {
 	defer teardown(t)
 	service := setup()
 	err := service.Subscribe("test@example.com")
-	if err != nil {
-		t.Errorf("%e", err)
-	}
+	assert.Nil(t, err)
 
 	// Act
 	err = service.Subscribe("test@example.com")
 
 	// Assert
 	assert.NotNil(t, err)
-	assert.IsType(t, &domain.DataConsistencyError{}, err)
 	assert.Equal(t, "Email address 'test@example.com' is already present in the database", err.(*domain.DataConsistencyError).Message)
 }

@@ -9,7 +9,7 @@ import (
 )
 
 type FileEmailRepository struct {
-	Emails      hashset.Set
+	emails      hashset.Set
 	storageFile string
 }
 
@@ -28,16 +28,16 @@ func NewFileEmailRepository(storageFile string) (*FileEmailRepository, error) {
 		}
 	}
 
-	r := FileEmailRepository{Emails: emails, storageFile: storageFile}
+	r := FileEmailRepository{emails: emails, storageFile: storageFile}
 	return &r, nil
 }
 
 func (r *FileEmailRepository) AddEmail(email string) error {
-	if r.Emails.Contains(email) {
+	if r.emails.Contains(email) {
 		return &domain.DataConsistencyError{Message: fmt.Sprintf("Email address '%s' is already present in the database", email)}
 	}
 
-	r.Emails.Add(email)
+	r.emails.Add(email)
 	return nil
 }
 
@@ -46,7 +46,7 @@ func (r *FileEmailRepository) GetAll() []string {
 		return []string{}
 	}
 
-	values := r.Emails.Values()
+	values := r.emails.Values()
 
 	emailsArray := make([]string, len(values))
 	for i, value := range values {
@@ -57,7 +57,7 @@ func (r *FileEmailRepository) GetAll() []string {
 }
 
 func (r *FileEmailRepository) Save() error {
-	data, err := r.Emails.MarshalJSON()
+	data, err := r.emails.MarshalJSON()
 	if err != nil {
 		return err
 	}
