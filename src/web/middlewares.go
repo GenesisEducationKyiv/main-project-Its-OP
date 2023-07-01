@@ -19,6 +19,8 @@ func errorHandlingMiddleware() gin.HandlerFunc {
 					c.String(http.StatusBadRequest, e.Error())
 				case *domain.DataConsistencyError:
 					c.String(http.StatusConflict, e.Error())
+				case *domain.ArgumentError:
+					c.String(http.StatusBadRequest, e.Error())
 				default:
 					c.String(http.StatusInternalServerError, defaultErrorMessage)
 				}

@@ -2,13 +2,10 @@ package web
 
 import (
 	"btcRate/application"
-	"btcRate/docs"
 	"btcRate/domain"
 	"btcRate/infrastructure"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
-	swaggerfiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 	"net/http"
 	"os"
 	"regexp"
@@ -26,37 +23,23 @@ type btcUahController struct {
 	coin     string
 }
 
-func RunBtcUahController() error {
-	var emailRepository, err = infrastructure.NewFileEmailRepository()
+func newBtcUahController(storageFile string) (*btcUahController, error) {
+	var emailRepository, err = infrastructure.NewFileEmailRepository(storageFile)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var bitcoinClient = infrastructure.NewBinanceClient()
 	var sendgrid = sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
 	var emailClient = infrastructure.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
-	var btcUahService = application.NewCoinService(bitcoinClient, emailClient, emailRepository)
 
-	controller := btcUahController{service: btcUahService, currency: "UAH", coin: "BTC"}
+	supportedCurrency := "UAH"
+	supportedCoin := "BTC"
+	var btcUahService = application.NewCoinService([]string{supportedCurrency}, []string{supportedCoin}, bitcoinClient, emailClient, emailRepository)
 
-	r := gin.Default()
-	r.Use(errorHandlingMiddleware())
+	controller := &btcUahController{service: btcUahService, currency: supportedCurrency, coin: supportedCoin}
 
-	docs.SwaggerInfo.BasePath = "/api/v1"
-	api := r.Group("/api/v1")
-	{
-		api.GET("/rate", controller.getRate)
-		api.POST("/subscribe", controller.subscribe)
-		api.POST("/sendEmails", controller.sendEmails)
-	}
-
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	err = r.Run(":8080") // Run on port 8080
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return controller, nil
 }
 
 // @Summary Get current BTC to UAH rate
