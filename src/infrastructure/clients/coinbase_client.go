@@ -16,9 +16,9 @@ type CoinbaseClient struct {
 	baseURL *url.URL
 }
 
-func NewCoinbaseClient() *BinanceClient {
+func NewCoinbaseClient() *CoinbaseClient {
 	baseUrl := &url.URL{Scheme: "https", Host: "api.coinbase.com", Path: "/v2"}
-	return &BinanceClient{client: http.DefaultClient, baseURL: baseUrl}
+	return &CoinbaseClient{client: http.DefaultClient, baseURL: baseUrl}
 }
 
 func (c *CoinbaseClient) GetRate(currency string, coin string) (float64, time.Time, error) {
@@ -53,8 +53,6 @@ func (c *CoinbaseClient) GetRate(currency string, coin string) (float64, time.Ti
 
 type coinbaseResponse struct {
 	Data struct {
-		Base     string `json:"base"`
-		Currency string `json:"currency"`
-		Amount   string `json:"amount"`
+		Amount string `json:"amount"`
 	} `json:"data"`
 }
