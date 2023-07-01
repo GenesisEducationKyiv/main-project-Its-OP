@@ -9,7 +9,7 @@ import (
 type BinanceClientFactory struct{}
 
 func (BinanceClientFactory) CreateClient() application.ICoinClient {
-	httpClient := infrastructure.NewExtendedHttpClient(nil)
+	httpClient := infrastructure.NewHttpClient(nil)
 	binanceClient := integrations.NewBinanceClient(httpClient)
 
 	return binanceClient

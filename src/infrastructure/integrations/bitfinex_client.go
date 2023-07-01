@@ -3,6 +3,7 @@ package integrations
 import (
 	"btcRate/application"
 	"btcRate/domain"
+	"btcRate/infrastructure"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,12 +13,12 @@ import (
 )
 
 type BitfinexClient struct {
-	client  IExtendedHttpClient
+	client  infrastructure.IHttpClient
 	baseURL *url.URL
 	next    application.ICoinClient
 }
 
-func NewBitfinexClient(client IExtendedHttpClient) *BitfinexClient {
+func NewBitfinexClient(client infrastructure.IHttpClient) *BitfinexClient {
 	baseUrl := &url.URL{Scheme: "https", Host: "api.bitfinex.com", Path: "/v1"}
 	return &BitfinexClient{client: client, baseURL: baseUrl}
 }
@@ -31,8 +32,8 @@ func (b *BitfinexClient) GetRate(currency string, coin string) (float64, time.Ti
 		return 0, time.Time{}, err
 	}
 
-	respBody, code, err := b.client.SendRequest(req)
-	if err != nil || code != http.StatusOK {
+	resp, err := b.client.SendRequest(req)
+	if err != nil || resp.Code != http.StatusOK {
 		if b.next != nil {
 			return b.next.GetRate(currency, coin)
 		}
@@ -43,7 +44,7 @@ func (b *BitfinexClient) GetRate(currency string, coin string) (float64, time.Ti
 	timestamp := time.Now()
 
 	var result bitfinexResponse
-	err = json.Unmarshal(respBody, &result)
+	err = json.Unmarshal(resp.Body, &result)
 	if err != nil {
 		if b.next != nil {
 			return b.next.GetRate(currency, coin)

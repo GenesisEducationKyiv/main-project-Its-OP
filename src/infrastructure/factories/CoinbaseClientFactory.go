@@ -9,7 +9,7 @@ import (
 type CoinbaseClientFactory struct{}
 
 func (CoinbaseClientFactory) CreateClient() application.ICoinClient {
-	httpClient := infrastructure.NewExtendedHttpClient(nil)
+	httpClient := infrastructure.NewHttpClient(nil)
 	coinbaseClient := integrations.NewCoinbaseClient(httpClient)
 
 	return coinbaseClient

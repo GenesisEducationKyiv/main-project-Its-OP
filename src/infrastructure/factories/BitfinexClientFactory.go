@@ -9,7 +9,7 @@ import (
 type BitfinexClientFactory struct{}
 
 func (BitfinexClientFactory) CreateClient() application.ICoinClient {
-	httpClient := infrastructure.NewExtendedHttpClient(nil)
+	httpClient := infrastructure.NewHttpClient(nil)
 	bitfinexClient := integrations.NewBitfinexClient(httpClient)
 
 	return bitfinexClient

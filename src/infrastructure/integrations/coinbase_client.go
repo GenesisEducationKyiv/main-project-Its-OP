@@ -3,6 +3,7 @@ package integrations
 import (
 	"btcRate/application"
 	"btcRate/domain"
+	"btcRate/infrastructure"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,12 +13,12 @@ import (
 )
 
 type CoinbaseClient struct {
-	client  IExtendedHttpClient
+	client  infrastructure.IHttpClient
 	baseURL *url.URL
 	next    application.ICoinClient
 }
 
-func NewCoinbaseClient(client IExtendedHttpClient) *CoinbaseClient {
+func NewCoinbaseClient(client infrastructure.IHttpClient) *CoinbaseClient {
 	baseUrl := &url.URL{Scheme: "https", Host: "api.coinbase.com", Path: "/v2"}
 	return &CoinbaseClient{client: client, baseURL: baseUrl}
 }
@@ -31,8 +32,8 @@ func (c *CoinbaseClient) GetRate(currency string, coin string) (float64, time.Ti
 		return 0, time.Time{}, err
 	}
 
-	respBody, code, err := c.client.SendRequest(req)
-	if err != nil || code != http.StatusOK {
+	resp, err := c.client.SendRequest(req)
+	if err != nil || resp.Code != http.StatusOK {
 		if c.next != nil {
 			return c.next.GetRate(currency, coin)
 		}
@@ -43,7 +44,7 @@ func (c *CoinbaseClient) GetRate(currency string, coin string) (float64, time.Ti
 	timestamp := time.Now()
 
 	var result coinbaseResponse
-	err = json.Unmarshal(respBody, &result)
+	err = json.Unmarshal(resp.Body, &result)
 	if err != nil {
 		if c.next != nil {
 			return c.next.GetRate(currency, coin)
