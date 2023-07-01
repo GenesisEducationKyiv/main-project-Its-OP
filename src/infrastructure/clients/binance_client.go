@@ -1,4 +1,4 @@
-package infrastructure
+package clients
 
 import (
 	"btcRate/domain"
@@ -37,7 +37,7 @@ func (b *BinanceClient) GetRate(currency string, coin string) (float64, time.Tim
 		return 0.0, time.Time{}, err
 	}
 
-	var result PriceResponse
+	var result binanceResponse
 	err = json.Unmarshal(respBody, &result)
 	if err != nil {
 		return 0.0, time.Time{}, err
@@ -51,7 +51,7 @@ func (b *BinanceClient) GetRate(currency string, coin string) (float64, time.Tim
 	return price, timestamp, nil
 }
 
-type PriceResponse struct {
+type binanceResponse struct {
 	Symbol string
 	Price  string
 }
