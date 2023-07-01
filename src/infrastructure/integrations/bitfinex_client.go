@@ -1,4 +1,4 @@
-package clients
+package integrations
 
 import (
 	"btcRate/domain"

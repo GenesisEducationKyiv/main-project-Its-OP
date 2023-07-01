@@ -5,7 +5,7 @@ import (
 	"btcRate/application/validators"
 	"btcRate/domain"
 	"btcRate/infrastructure"
-	"btcRate/infrastructure/clients"
+	"btcRate/infrastructure/integrations"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
 	"net/http"
@@ -34,9 +34,9 @@ func newBtcUahController(storageFile string) (*btcUahController, error) {
 		return nil, err
 	}
 
-	var bitcoinClient = clients.NewBinanceClient()
+	var bitcoinClient = integrations.NewBinanceClient()
 	var sendgrid = sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
-	var emailClient = clients.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
+	var emailClient = integrations.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
 
 	var emailValidator = &validators.EmailValidator{}
 	var supportedCoinValidator = validators.NewSupportedCoinValidator([]string{supportedCoin})
