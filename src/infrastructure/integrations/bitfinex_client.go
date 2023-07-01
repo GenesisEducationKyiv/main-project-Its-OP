@@ -15,7 +15,7 @@ type BitfinexClient struct {
 	baseURL *url.URL
 }
 
-func NewByBitClient(client IExtendedHttpClient) *BitfinexClient {
+func NewBitfinexClient(client IExtendedHttpClient) *BitfinexClient {
 	baseUrl := &url.URL{Scheme: "https", Host: "api.bitfinex.com", Path: "/v1"}
 	return &BitfinexClient{client: client, baseURL: baseUrl}
 }

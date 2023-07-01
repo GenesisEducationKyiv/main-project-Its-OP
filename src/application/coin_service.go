@@ -6,7 +6,10 @@ import (
 	"time"
 )
 
-//go:generate mockery --name ICoinClient
+type ICoinClientFactory interface {
+	CreateClient() ICoinClient
+}
+
 type ICoinClient interface {
 	GetRate(currency string, coin string) (float64, time.Time, error)
 }
