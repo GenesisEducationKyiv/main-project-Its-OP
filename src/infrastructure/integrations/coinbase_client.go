@@ -37,7 +37,7 @@ func (c *CoinbaseClient) GetRate(currency string, coin string) (float64, time.Ti
 			return c.next.GetRate(currency, coin)
 		}
 
-		return 0.0, time.Time{}, &domain.EndpointInaccessibleError{Message: "Couldn't access the Coinbase endpoint"}
+		return 0.0, time.Time{}, &domain.EndpointInaccessibleError{Message: endpointInaccessibleErrorMessage}
 	}
 
 	timestamp := time.Now()

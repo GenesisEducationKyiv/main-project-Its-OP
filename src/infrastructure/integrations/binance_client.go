@@ -37,7 +37,7 @@ func (b *BinanceClient) GetRate(currency string, coin string) (float64, time.Tim
 			return b.next.GetRate(currency, coin)
 		}
 
-		return 0.0, time.Time{}, &domain.EndpointInaccessibleError{Message: "Couldn't access the Binance endpoint"}
+		return 0.0, time.Time{}, &domain.EndpointInaccessibleError{Message: endpointInaccessibleErrorMessage}
 	}
 
 	timestamp := time.Now()

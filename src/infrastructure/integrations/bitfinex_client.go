@@ -37,7 +37,7 @@ func (b *BitfinexClient) GetRate(currency string, coin string) (float64, time.Ti
 			return b.next.GetRate(currency, coin)
 		}
 
-		return 0.0, time.Time{}, &domain.EndpointInaccessibleError{Message: "Couldn't access the Bitfinex endpoint"}
+		return 0.0, time.Time{}, &domain.EndpointInaccessibleError{Message: endpointInaccessibleErrorMessage}
 	}
 
 	timestamp := time.Now()
