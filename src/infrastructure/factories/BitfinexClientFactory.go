@@ -1,15 +1,16 @@
 package factories
 
 import (
+	"btcRate/application"
 	"btcRate/infrastructure"
 	"btcRate/infrastructure/integrations"
 )
 
 type BitfinexClientFactory struct{}
 
-func (*BitfinexClientFactory) CreateClient() *integrations.BitfinexClient {
+func (BitfinexClientFactory) CreateClient() application.ICoinClient {
 	httpClient := infrastructure.NewExtendedHttpClient(nil)
-	binanceClient := integrations.NewBitfinexClient(httpClient)
+	bitfinexClient := integrations.NewBitfinexClient(httpClient)
 
-	return binanceClient
+	return bitfinexClient
 }
