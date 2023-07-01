@@ -26,18 +26,20 @@ type btcUahController struct {
 	coin            string
 }
 
-func newBtcUahController(storageFile string) (*btcUahController, error) {
+func newBtcUahController(emailStorageFile string, logStorageFile string) (*btcUahController, error) {
 	supportedCurrency := "UAH"
 	supportedCoin := "BTC"
 
-	var emailRepository, err = repositories.NewFileEmailRepository(storageFile)
+	var emailRepository, err = repositories.NewFileEmailRepository(emailStorageFile)
 	if err != nil {
 		return nil, err
 	}
 
-	binanceFactory := factories.BinanceClientFactory{}
-	coinbaseFactory := factories.CoinbaseClientFactory{}
-	bitfinexFactory := factories.BitfinexClientFactory{}
+	logRepository := repositories.NewFileLogRepository(logStorageFile)
+
+	binanceFactory := factories.NewBinanceClientFactory(logRepository)
+	coinbaseFactory := factories.NewCoinbaseClientFactory(logRepository)
+	bitfinexFactory := factories.NewBitfinexClientFactory(logRepository)
 
 	coinClientFactories := []application.ICoinClientFactory{binanceFactory, coinbaseFactory, bitfinexFactory}
 

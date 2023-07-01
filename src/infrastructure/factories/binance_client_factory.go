@@ -7,11 +7,17 @@ import (
 	"btcRate/infrastructure/integrations"
 )
 
-type BinanceClientFactory struct{}
+type BinanceClientFactory struct {
+	logRepository extensions.ILogRepository
+}
 
-func (BinanceClientFactory) CreateClient() application.ICoinClient {
+func NewBinanceClientFactory(logRepository extensions.ILogRepository) *BinanceClientFactory {
+	return &BinanceClientFactory{logRepository: logRepository}
+}
+
+func (f *BinanceClientFactory) CreateClient() application.ICoinClient {
 	httpClient := infrastructure.NewHttpClient(nil)
-	loggedHttpClient := extensions.NewLoggedHttpClient(httpClient)
+	loggedHttpClient := extensions.NewLoggedHttpClient(httpClient, f.logRepository)
 
 	binanceClient := integrations.NewBinanceClient(loggedHttpClient)
 

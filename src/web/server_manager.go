@@ -27,11 +27,11 @@ func NewServerManager() ServerManager {
 	return ServerManager{infrastructure.NewHttpClient(nil)}
 }
 
-func (*ServerManager) RunServer(storageFile string) (func() error, error) {
+func (*ServerManager) RunServer(emailStorageFile string, logStorageFile string) (func() error, error) {
 	r := gin.Default()
 	r.Use(errorHandlingMiddleware())
 
-	btcUahController, err := newBtcUahController(storageFile)
+	btcUahController, err := newBtcUahController(emailStorageFile, logStorageFile)
 	if err != nil {
 		return nil, err
 	}

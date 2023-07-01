@@ -7,11 +7,17 @@ import (
 	"btcRate/infrastructure/integrations"
 )
 
-type CoinbaseClientFactory struct{}
+type CoinbaseClientFactory struct {
+	logRepository extensions.ILogRepository
+}
 
-func (CoinbaseClientFactory) CreateClient() application.ICoinClient {
+func NewCoinbaseClientFactory(logRepository extensions.ILogRepository) *CoinbaseClientFactory {
+	return &CoinbaseClientFactory{logRepository: logRepository}
+}
+
+func (f *CoinbaseClientFactory) CreateClient() application.ICoinClient {
 	httpClient := infrastructure.NewHttpClient(nil)
-	loggedHttpClient := extensions.NewLoggedHttpClient(httpClient)
+	loggedHttpClient := extensions.NewLoggedHttpClient(httpClient, f.logRepository)
 
 	coinbaseClient := integrations.NewCoinbaseClient(loggedHttpClient)
 
