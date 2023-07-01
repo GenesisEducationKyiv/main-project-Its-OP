@@ -22,8 +22,15 @@ type CoinService struct {
 	currencyValidator domain.IValidator[string]
 }
 
-func NewCoinService(client ICoinClient, campaignService domain.ICampaignService, coinValidator domain.IValidator[string], currencyValidator domain.IValidator[string]) *CoinService {
-	return &CoinService{coinClient: client, campaignService: campaignService, coinValidator: coinValidator, currencyValidator: currencyValidator}
+func NewCoinService(factories []ICoinClientFactory, campaignService domain.ICampaignService, coinValidator domain.IValidator[string], currencyValidator domain.IValidator[string]) *CoinService {
+	var clients []ICoinClient
+	for _, f := range factories {
+		clients = append(clients, f.CreateClient())
+	}
+
+	firstClient := buildChainOfClients(clients)
+
+	return &CoinService{coinClient: firstClient, campaignService: campaignService, coinValidator: coinValidator, currencyValidator: currencyValidator}
 }
 
 func (c *CoinService) GetCurrentRate(currency string, coin string) (*domain.Price, error) {
@@ -81,4 +88,21 @@ func (c *CoinService) validateParameters(currency string, coin string) error {
 	}
 
 	return nil
+}
+
+func buildChainOfClients(clients []ICoinClient) ICoinClient {
+	if len(clients) == 0 {
+		return nil
+	} else if len(clients) == 1 {
+		return clients[0]
+	}
+
+	returnedClient := clients[len(clients)-1]
+	for i := len(clients) - 2; i >= 0; i-- {
+		client := clients[i]
+		client.SetNext(returnedClient)
+		returnedClient = client
+	}
+
+	return returnedClient
 }
