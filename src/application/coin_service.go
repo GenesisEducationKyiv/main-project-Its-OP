@@ -11,15 +11,20 @@ type ICoinClientFactory interface {
 }
 
 type ICoinClient interface {
-	GetRate(currency string, coin string) (float64, time.Time, error)
+	GetRate(currency string, coin string) (*SpotPrice, error)
 	SetNext(client ICoinClient)
 }
 
 type CoinService struct {
 	coinClient        ICoinClient
-	campaignService   domain.ICampaignService
-	coinValidator     domain.IValidator[string]
-	currencyValidator domain.IValidator[string]
+	campaignService   ICampaignService
+	coinValidator     IValidator[string]
+	currencyValidator IValidator[string]
+}
+
+type SpotPrice struct {
+	Amount    float64
+	Timestamp time.Time
 }
 
 func NewCoinService(factories []ICoinClientFactory, campaignService domain.ICampaignService, coinValidator domain.IValidator[string], currencyValidator domain.IValidator[string]) *CoinService {
@@ -39,16 +44,16 @@ func (c *CoinService) GetCurrentRate(currency string, coin string) (*domain.Pric
 		return nil, err
 	}
 
-	rate, time, err := c.coinClient.GetRate(currency, coin)
+	price, err := c.coinClient.GetRate(currency, coin)
 
 	if err != nil {
 		return nil, err
 	}
 
 	return &domain.Price{
-		Amount:    rate,
+		Amount:    price.Amount,
 		Currency:  currency,
-		Timestamp: time,
+		Timestamp: price.Timestamp,
 	}, nil
 }
 
@@ -68,7 +73,9 @@ func (c *CoinService) SendRateEmails(currency string, coin string) error {
 	<p><strong>Timestamp:</strong> %s<p>`
 	htmlBody := fmt.Sprintf(htmlTemplate, currentPrice.Amount, currentPrice.Currency, currentPrice.Timestamp.Format("02-01-06 15:04:05.999 Z0700"))
 
-	err = c.campaignService.SendEmails(htmlBody)
+	mail := &MailBody{Subject: "Current BTC to UAH rate", ReceiverAlias: "Rate Recipient", HtmlContent: htmlBody}
+
+	err = c.campaignService.SendEmails(mail)
 	if err != nil {
 		return err
 	}

@@ -21,7 +21,7 @@ import (
 
 type btcUahController struct {
 	coinService     domain.ICoinService
-	campaignService domain.ICampaignService
+	campaignService application.ICampaignService
 	currency        string
 	coin            string
 }

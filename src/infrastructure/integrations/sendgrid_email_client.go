@@ -1,6 +1,7 @@
 package integrations
 
 import (
+	"btcRate/application"
 	"fmt"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -17,19 +18,19 @@ func NewSendGridEmailClient(client *sendgrid.Client, senderName string, senderEm
 	return &SendGridEmailClient{client: client, senderName: senderName, senderEmail: senderEmail}
 }
 
-func (s *SendGridEmailClient) Send(recipients []string, htmlContent string) error {
+func (s *SendGridEmailClient) Send(recipients []string, mailBody *application.MailBody) error {
 	if len(recipients) == 0 {
 		return nil
 	}
 
 	from := mail.NewEmail(s.senderName, s.senderEmail)
-	firstTo := mail.NewEmail("Rate Recipient", recipients[0])
-	subject := "Current BTC to UAH rate"
-	message := mail.NewSingleEmail(from, subject, firstTo, "", htmlContent)
+	firstTo := mail.NewEmail(mailBody.ReceiverAlias, recipients[0])
+	subject := mailBody.Subject
+	message := mail.NewSingleEmail(from, subject, firstTo, "", mailBody.HtmlContent)
 
 	for i := 1; i < len(recipients); i++ {
 		personalization := mail.NewPersonalization()
-		personalization.AddTos(mail.NewEmail("Rate Recipient", recipients[i]))
+		personalization.AddTos(mail.NewEmail(mailBody.ReceiverAlias, recipients[i]))
 		message.AddPersonalizations(personalization)
 	}
 
