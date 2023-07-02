@@ -9,7 +9,7 @@ type IEmailRepository interface {
 }
 
 type IEmailClient interface {
-	Send(recipients []string, htmlContent string) error
+	Send(recipients []string, mailBody *MailBody) error
 }
 
 type CampaignService struct {
@@ -41,9 +41,9 @@ func (c *CampaignService) Subscribe(email string) error {
 	return nil
 }
 
-func (c *CampaignService) SendEmails(htmlBody string) error {
+func (c *CampaignService) SendEmails(mailBody *MailBody) error {
 	emails := c.emailRepository.GetAll()
-	err := c.emailClient.Send(emails, htmlBody)
+	err := c.emailClient.Send(emails, mailBody)
 	if err != nil {
 		return err
 	}

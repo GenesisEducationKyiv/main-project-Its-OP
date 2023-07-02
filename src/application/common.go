@@ -1,9 +1,9 @@
 package application
 
 type MailBody struct {
-	subject       string
-	htmlContent   string
-	receiverAlias string
+	Subject       string
+	HtmlContent   string
+	ReceiverAlias string
 }
 
 type ICampaignService interface {
