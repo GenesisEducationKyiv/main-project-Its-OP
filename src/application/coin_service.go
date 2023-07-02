@@ -8,7 +8,7 @@ import (
 
 //go:generate mockery --name ICoinClient
 type ICoinClient interface {
-	GetRate(currency string, coin string) (float64, time.Time, error)
+	GetRate(currency string, coin string) (*SpotPrice, error)
 }
 
 type CoinService struct {
@@ -16,6 +16,11 @@ type CoinService struct {
 	campaignService   domain.ICampaignService
 	coinValidator     domain.IValidator[string]
 	currencyValidator domain.IValidator[string]
+}
+
+type SpotPrice struct {
+	Amount    float64
+	Timestamp time.Time
 }
 
 func NewCoinService(client ICoinClient, campaignService domain.ICampaignService, coinValidator domain.IValidator[string], currencyValidator domain.IValidator[string]) *CoinService {
@@ -28,16 +33,16 @@ func (c *CoinService) GetCurrentRate(currency string, coin string) (*domain.Pric
 		return nil, err
 	}
 
-	rate, time, err := c.coinClient.GetRate(currency, coin)
+	price, err := c.coinClient.GetRate(currency, coin)
 
 	if err != nil {
 		return nil, err
 	}
 
 	return &domain.Price{
-		Amount:    rate,
+		Amount:    price.Amount,
 		Currency:  currency,
-		Timestamp: time,
+		Timestamp: price.Timestamp,
 	}, nil
 }
 
