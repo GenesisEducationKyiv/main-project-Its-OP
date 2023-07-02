@@ -27,7 +27,7 @@ type SpotPrice struct {
 	Timestamp time.Time
 }
 
-func NewCoinService(factories []ICoinClientFactory, campaignService domain.ICampaignService, coinValidator domain.IValidator[string], currencyValidator domain.IValidator[string]) *CoinService {
+func NewCoinService(factories []ICoinClientFactory, campaignService ICampaignService, coinValidator IValidator[string], currencyValidator IValidator[string]) *CoinService {
 	var clients []ICoinClient
 	for _, f := range factories {
 		clients = append(clients, f.CreateClient())

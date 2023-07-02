@@ -23,13 +23,13 @@ func NewBinanceClient(client infrastructure.IHttpClient) *BinanceClient {
 	return &BinanceClient{client: client, baseURL: baseUrl}
 }
 
-func (b *BinanceClient) GetRate(currency string, coin string) (float64, time.Time, error) {
+func (b *BinanceClient) GetRate(currency string, coin string) (*application.SpotPrice, error) {
 	path := fmt.Sprintf("/ticker/price?symbol=%s%s", coin, currency)
 	url := b.baseURL.String() + path
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return 0, time.Time{}, err
+		return nil, err
 	}
 
 	resp, err := b.client.SendRequest(req)
@@ -38,7 +38,7 @@ func (b *BinanceClient) GetRate(currency string, coin string) (float64, time.Tim
 			return b.next.GetRate(currency, coin)
 		}
 
-		return 0.0, time.Time{}, &domain.EndpointInaccessibleError{Message: endpointInaccessibleErrorMessage}
+		return nil, &domain.EndpointInaccessibleError{Message: endpointInaccessibleErrorMessage}
 	}
 
 	timestamp := time.Now()
@@ -50,15 +50,15 @@ func (b *BinanceClient) GetRate(currency string, coin string) (float64, time.Tim
 			return b.next.GetRate(currency, coin)
 		}
 
-		return 0, time.Time{}, err
+		return nil, err
 	}
 
 	price, err := strconv.ParseFloat(result.Price, 64)
 	if err != nil {
-		return 0, time.Time{}, err
+		return nil, err
 	}
 
-	return price, timestamp, nil
+	return &application.SpotPrice{Amount: price, Timestamp: timestamp}, nil
 }
 
 func (b *BinanceClient) SetNext(client application.ICoinClient) {
