@@ -62,7 +62,9 @@ func (c *CoinService) SendRateEmails(currency string, coin string) error {
 	<p><strong>Timestamp:</strong> %s<p>`
 	htmlBody := fmt.Sprintf(htmlTemplate, currentPrice.Amount, currentPrice.Currency, currentPrice.Timestamp.Format("02-01-06 15:04:05.999 Z0700"))
 
-	err = c.campaignService.SendEmails(htmlBody)
+	mail := &MailBody{subject: "Current BTC to UAH rate", receiverAlias: "Rate Recipient", htmlContent: htmlBody}
+
+	err = c.campaignService.SendEmails(mail)
 	if err != nil {
 		return err
 	}
