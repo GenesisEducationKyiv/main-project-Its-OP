@@ -14,8 +14,8 @@ type ICoinClient interface {
 type CoinService struct {
 	coinClient        ICoinClient
 	campaignService   ICampaignService
-	coinValidator     domain.IValidator[string]
-	currencyValidator domain.IValidator[string]
+	coinValidator     IValidator[string]
+	currencyValidator IValidator[string]
 }
 
 type SpotPrice struct {
@@ -23,7 +23,7 @@ type SpotPrice struct {
 	Timestamp time.Time
 }
 
-func NewCoinService(client ICoinClient, campaignService ICampaignService, coinValidator domain.IValidator[string], currencyValidator domain.IValidator[string]) *CoinService {
+func NewCoinService(client ICoinClient, campaignService ICampaignService, coinValidator IValidator[string], currencyValidator IValidator[string]) *CoinService {
 	return &CoinService{coinClient: client, campaignService: campaignService, coinValidator: coinValidator, currencyValidator: currencyValidator}
 }
 
