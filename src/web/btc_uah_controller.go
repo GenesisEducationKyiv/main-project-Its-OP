@@ -2,13 +2,13 @@ package web
 
 import (
 	"btcRate/application"
+	"btcRate/application/validators"
 	"btcRate/domain"
 	"btcRate/infrastructure"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
 	"net/http"
 	"os"
-	"regexp"
 )
 
 // @title GSES2 BTC application API
@@ -18,12 +18,16 @@ import (
 // @BasePath /api
 
 type btcUahController struct {
-	service  domain.ICoinService
-	currency string
-	coin     string
+	coinService     domain.ICoinService
+	campaignService application.ICampaignService
+	currency        string
+	coin            string
 }
 
 func newBtcUahController(storageFile string) (*btcUahController, error) {
+	supportedCurrency := "UAH"
+	supportedCoin := "BTC"
+
 	var emailRepository, err = infrastructure.NewFileEmailRepository(storageFile)
 	if err != nil {
 		return nil, err
@@ -33,24 +37,28 @@ func newBtcUahController(storageFile string) (*btcUahController, error) {
 	var sendgrid = sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
 	var emailClient = infrastructure.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
 
-	supportedCurrency := "UAH"
-	supportedCoin := "BTC"
-	var btcUahService = application.NewCoinService([]string{supportedCurrency}, []string{supportedCoin}, bitcoinClient, emailClient, emailRepository)
+	var emailValidator = &validators.EmailValidator{}
+	var supportedCoinValidator = validators.NewSupportedCoinValidator([]string{supportedCoin})
+	var supportedCurrencyValidator = validators.NewSupportedCurrencyValidator([]string{supportedCurrency})
 
-	controller := &btcUahController{service: btcUahService, currency: supportedCurrency, coin: supportedCoin}
+	var campaignService = application.NewCampaignService(emailRepository, emailClient, emailValidator)
+
+	var btcUahService = application.NewCoinService(bitcoinClient, campaignService, supportedCoinValidator, supportedCurrencyValidator)
+
+	controller := &btcUahController{coinService: btcUahService, campaignService: campaignService, currency: supportedCurrency, coin: supportedCoin}
 
 	return controller, nil
 }
 
 // @Summary Get current BTC to UAH rate
-// @Description Get the current rate of BTC to UAH using any third-party service with public API
+// @Description Get the current rate of BTC to UAH using any third-party coinService with public API
 // @Tags rate
 // @Produce  json
 // @Success 200 {number} number "Successful operation"
 // @Failure 400 {object} string "Invalid status value"
 // @Router /rate [get]
 func (c *btcUahController) getRate(context *gin.Context) {
-	price, err := c.service.GetCurrentRate(c.currency, c.coin)
+	price, err := c.coinService.GetCurrentRate(c.currency, c.coin)
 
 	if err != nil {
 		_ = context.Error(err)
@@ -71,20 +79,8 @@ func (c *btcUahController) getRate(context *gin.Context) {
 // @Router /subscribe [post]
 func (c *btcUahController) subscribe(context *gin.Context) {
 	email := context.PostForm("email")
-	if email == "" {
-		context.String(http.StatusBadRequest, "Email is required")
-		return
-	}
 
-	if valid, err := validateEmail(&email); err != nil {
-		_ = context.Error(err)
-		return
-	} else if !valid {
-		context.String(http.StatusBadRequest, "Email is invalid")
-		return
-	}
-
-	err := c.service.Subscribe(email)
+	err := c.campaignService.Subscribe(email)
 	if err != nil {
 		_ = context.Error(err)
 		return
@@ -100,21 +96,11 @@ func (c *btcUahController) subscribe(context *gin.Context) {
 // @Success 200 {object} string "E-mails sent"
 // @Router /sendEmails [post]
 func (c *btcUahController) sendEmails(context *gin.Context) {
-	err := c.service.SendRateEmails(c.currency, c.coin)
+	err := c.coinService.SendRateEmails(c.currency, c.coin)
 	if err != nil {
 		_ = context.Error(err)
 		return
 	}
 
 	context.String(http.StatusOK, "E-mails sent")
-}
-
-func validateEmail(email *string) (bool, error) {
-	regexString := "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-	match, err := regexp.Match(regexString, []byte(*email))
-	if err != nil {
-		return false, err
-	}
-
-	return match, nil
 }
