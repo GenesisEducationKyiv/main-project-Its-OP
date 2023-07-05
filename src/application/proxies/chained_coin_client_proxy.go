@@ -1,4 +1,4 @@
-package application
+package proxies
 
 import "btcRate/application/services"
 
