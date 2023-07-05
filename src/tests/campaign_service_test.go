@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"btcRate/application"
+	"btcRate/application/services"
 	"btcRate/application/validators"
 	"btcRate/domain"
 	"btcRate/infrastructure/repositories"
@@ -12,10 +12,10 @@ import (
 
 const storageFile = "artifacts/emails.json"
 
-func setup() *application.CampaignService {
+func setup() *services.CampaignService {
 	emailRepo, _ := repositories.NewFileEmailRepository(storageFile)
 	emailValidator := &validators.EmailValidator{}
-	service := application.NewCampaignService(emailRepo, nil, emailValidator)
+	service := services.NewCampaignService(emailRepo, nil, emailValidator)
 
 	return service
 }

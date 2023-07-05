@@ -2,6 +2,7 @@ package web
 
 import (
 	"btcRate/application"
+	"btcRate/application/services"
 	"btcRate/application/validators"
 	"btcRate/domain"
 	"btcRate/infrastructure/factories"
@@ -41,7 +42,7 @@ func newBtcUahController(emailStorageFile string, logStorageFile string) (*btcUa
 	coinbaseFactory := factories.NewCoinbaseClientFactory(logRepository)
 	bitfinexFactory := factories.NewBitfinexClientFactory(logRepository)
 
-	coinClientFactories := []application.ICoinClientFactory{binanceFactory, coinbaseFactory, bitfinexFactory}
+	coinClientFactories := []services.ICoinClientFactory{binanceFactory, coinbaseFactory, bitfinexFactory}
 
 	var sendgrid = sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
 	var emailClient = integrations.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
@@ -50,9 +51,9 @@ func newBtcUahController(emailStorageFile string, logStorageFile string) (*btcUa
 	var supportedCoinValidator = validators.NewSupportedCoinValidator([]string{supportedCoin})
 	var supportedCurrencyValidator = validators.NewSupportedCurrencyValidator([]string{supportedCurrency})
 
-	var campaignService = application.NewCampaignService(emailRepository, emailClient, emailValidator)
+	var campaignService = services.NewCampaignService(emailRepository, emailClient, emailValidator)
 
-	var btcUahService = application.NewCoinService(coinClientFactories, campaignService, supportedCoinValidator, supportedCurrencyValidator)
+	var btcUahService = services.NewCoinService(coinClientFactories, campaignService, supportedCoinValidator, supportedCurrencyValidator)
 
 	controller := &btcUahController{coinService: btcUahService, campaignService: campaignService, currency: supportedCurrency, coin: supportedCoin}
 

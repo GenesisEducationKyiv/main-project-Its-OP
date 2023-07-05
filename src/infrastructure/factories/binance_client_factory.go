@@ -1,7 +1,7 @@
 package factories
 
 import (
-	"btcRate/application"
+	"btcRate/application/services"
 	"btcRate/infrastructure"
 	"btcRate/infrastructure/extensions"
 	"btcRate/infrastructure/integrations"
@@ -15,7 +15,7 @@ func NewBinanceClientFactory(logRepository extensions.ILogRepository) *BinanceCl
 	return &BinanceClientFactory{logRepository: logRepository}
 }
 
-func (f *BinanceClientFactory) CreateClient() application.ICoinClient {
+func (f *BinanceClientFactory) CreateClient() services.ICoinClient {
 	httpClient := infrastructure.NewHttpClient(nil)
 	loggedHttpClient := extensions.NewLoggedHttpClient(httpClient, f.logRepository)
 

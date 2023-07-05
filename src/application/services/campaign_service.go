@@ -1,4 +1,6 @@
-package application
+package services
+
+import "btcRate/application"
 
 type IEmailRepository interface {
 	AddEmail(email string) error
@@ -7,16 +9,16 @@ type IEmailRepository interface {
 }
 
 type IEmailClient interface {
-	Send(recipients []string, mailBody *MailBody) error
+	Send(recipients []string, mailBody *application.MailBody) error
 }
 
 type CampaignService struct {
 	emailRepository IEmailRepository
 	emailClient     IEmailClient
-	emailValidator  IValidator[string]
+	emailValidator  application.IValidator[string]
 }
 
-func NewCampaignService(repository IEmailRepository, client IEmailClient, emailValidator IValidator[string]) *CampaignService {
+func NewCampaignService(repository IEmailRepository, client IEmailClient, emailValidator application.IValidator[string]) *CampaignService {
 	return &CampaignService{emailRepository: repository, emailClient: client, emailValidator: emailValidator}
 }
 
@@ -39,7 +41,7 @@ func (c *CampaignService) Subscribe(email string) error {
 	return nil
 }
 
-func (c *CampaignService) SendEmails(mailBody *MailBody) error {
+func (c *CampaignService) SendEmails(mailBody *application.MailBody) error {
 	emails := c.emailRepository.GetAll()
 	err := c.emailClient.Send(emails, mailBody)
 	if err != nil {

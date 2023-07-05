@@ -1,7 +1,7 @@
 package integrations
 
 import (
-	"btcRate/application"
+	"btcRate/application/services"
 	"btcRate/domain"
 	"btcRate/infrastructure"
 	"encoding/json"
@@ -15,7 +15,7 @@ import (
 type BitfinexClient struct {
 	client  infrastructure.IHttpClient
 	baseURL *url.URL
-	next    application.ICoinClient
+	next    services.ICoinClient
 }
 
 func NewBitfinexClient(client infrastructure.IHttpClient) *BitfinexClient {
@@ -23,7 +23,7 @@ func NewBitfinexClient(client infrastructure.IHttpClient) *BitfinexClient {
 	return &BitfinexClient{client: client, baseURL: baseUrl}
 }
 
-func (b *BitfinexClient) GetRate(currency string, coin string) (*application.SpotPrice, error) {
+func (b *BitfinexClient) GetRate(currency string, coin string) (*services.SpotPrice, error) {
 	path := fmt.Sprintf("/pubticker/%s%s", coin, currency)
 	url := b.baseURL.String() + path
 
@@ -58,10 +58,10 @@ func (b *BitfinexClient) GetRate(currency string, coin string) (*application.Spo
 		return nil, err
 	}
 
-	return &application.SpotPrice{Amount: price, Timestamp: timestamp}, nil
+	return &services.SpotPrice{Amount: price, Timestamp: timestamp}, nil
 }
 
-func (b *BitfinexClient) SetNext(client application.ICoinClient) {
+func (b *BitfinexClient) SetNext(client services.ICoinClient) {
 	b.next = client
 }
 
