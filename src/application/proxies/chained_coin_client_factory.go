@@ -6,7 +6,7 @@ type ChainedCoinClientFactory struct {
 	factories []services.ICoinClientFactory
 }
 
-func (*ChainedCoinClientFactory) NewChainedCoinClientFactory(cfs []services.ICoinClientFactory) *ChainedCoinClientFactory {
+func NewChainedCoinClientFactory(cfs []services.ICoinClientFactory) *ChainedCoinClientFactory {
 	return &ChainedCoinClientFactory{factories: cfs}
 }
 
