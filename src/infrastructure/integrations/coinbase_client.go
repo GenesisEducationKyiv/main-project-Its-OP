@@ -15,7 +15,6 @@ import (
 type CoinbaseClient struct {
 	client  infrastructure.IHttpClient
 	baseURL *url.URL
-	next    services.ICoinClient
 }
 
 func NewCoinbaseClient(client infrastructure.IHttpClient) *CoinbaseClient {
@@ -34,10 +33,6 @@ func (c *CoinbaseClient) GetRate(currency string, coin string) (*services.SpotPr
 
 	resp, err := c.client.SendRequest(req)
 	if err != nil || resp.Code != http.StatusOK {
-		if c.next != nil {
-			return c.next.GetRate(currency, coin)
-		}
-
 		return nil, &domain.EndpointInaccessibleError{Message: endpointInaccessibleErrorMessage}
 	}
 
@@ -46,10 +41,6 @@ func (c *CoinbaseClient) GetRate(currency string, coin string) (*services.SpotPr
 	var result coinbaseResponse
 	err = json.Unmarshal(resp.Body, &result)
 	if err != nil {
-		if c.next != nil {
-			return c.next.GetRate(currency, coin)
-		}
-
 		return nil, err
 	}
 
@@ -59,10 +50,6 @@ func (c *CoinbaseClient) GetRate(currency string, coin string) (*services.SpotPr
 	}
 
 	return &services.SpotPrice{Amount: price, Timestamp: timestamp}, err
-}
-
-func (b *CoinbaseClient) SetNext(client services.ICoinClient) {
-	b.next = client
 }
 
 type coinbaseResponse struct {

@@ -15,7 +15,6 @@ import (
 type BitfinexClient struct {
 	client  infrastructure.IHttpClient
 	baseURL *url.URL
-	next    services.ICoinClient
 }
 
 func NewBitfinexClient(client infrastructure.IHttpClient) *BitfinexClient {
@@ -34,10 +33,6 @@ func (b *BitfinexClient) GetRate(currency string, coin string) (*services.SpotPr
 
 	resp, err := b.client.SendRequest(req)
 	if err != nil || resp.Code != http.StatusOK {
-		if b.next != nil {
-			return b.next.GetRate(currency, coin)
-		}
-
 		return nil, &domain.EndpointInaccessibleError{Message: endpointInaccessibleErrorMessage}
 	}
 
@@ -46,10 +41,6 @@ func (b *BitfinexClient) GetRate(currency string, coin string) (*services.SpotPr
 	var result bitfinexResponse
 	err = json.Unmarshal(resp.Body, &result)
 	if err != nil {
-		if b.next != nil {
-			return b.next.GetRate(currency, coin)
-		}
-
 		return nil, err
 	}
 
@@ -59,10 +50,6 @@ func (b *BitfinexClient) GetRate(currency string, coin string) (*services.SpotPr
 	}
 
 	return &services.SpotPrice{Amount: price, Timestamp: timestamp}, nil
-}
-
-func (b *BitfinexClient) SetNext(client services.ICoinClient) {
-	b.next = client
 }
 
 type bitfinexResponse struct {

@@ -15,7 +15,6 @@ import (
 type BinanceClient struct {
 	client  infrastructure.IHttpClient
 	baseURL *url.URL
-	next    services.ICoinClient
 }
 
 func NewBinanceClient(client infrastructure.IHttpClient) *BinanceClient {
@@ -34,10 +33,6 @@ func (b *BinanceClient) GetRate(currency string, coin string) (*services.SpotPri
 
 	resp, err := b.client.SendRequest(req)
 	if err != nil || resp.Code != http.StatusOK {
-		if b.next != nil {
-			return b.next.GetRate(currency, coin)
-		}
-
 		return nil, &domain.EndpointInaccessibleError{Message: endpointInaccessibleErrorMessage}
 	}
 
@@ -46,10 +41,6 @@ func (b *BinanceClient) GetRate(currency string, coin string) (*services.SpotPri
 	var result binanceResponse
 	err = json.Unmarshal(resp.Body, &result)
 	if err != nil {
-		if b.next != nil {
-			return b.next.GetRate(currency, coin)
-		}
-
 		return nil, err
 	}
 
@@ -59,10 +50,6 @@ func (b *BinanceClient) GetRate(currency string, coin string) (*services.SpotPri
 	}
 
 	return &services.SpotPrice{Amount: price, Timestamp: timestamp}, nil
-}
-
-func (b *BinanceClient) SetNext(client services.ICoinClient) {
-	b.next = client
 }
 
 type binanceResponse struct {
