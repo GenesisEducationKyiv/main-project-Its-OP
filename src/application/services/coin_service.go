@@ -13,10 +13,7 @@ type ICoinClientFactory interface {
 
 type ICoinClient interface {
 	GetRate(currency string, coin string) (*SpotPrice, error)
-	SetNext(client ICoinClient)
 }
-
-type
 
 type CoinService struct {
 	coinClient        ICoinClient
@@ -30,15 +27,10 @@ type SpotPrice struct {
 	Timestamp time.Time
 }
 
-func NewCoinService(factories []ICoinClientFactory, campaignService application.ICampaignService, coinValidator application.IValidator[string], currencyValidator application.IValidator[string]) *CoinService {
-	var clients []ICoinClient
-	for _, f := range factories {
-		clients = append(clients, f.CreateClient())
-	}
+func NewCoinService(factory ICoinClientFactory, campaignService application.ICampaignService, coinValidator application.IValidator[string], currencyValidator application.IValidator[string]) *CoinService {
+	coinClient := factory.CreateClient()
 
-	firstClient := buildChainOfClients(clients)
-
-	return &CoinService{coinClient: firstClient, campaignService: campaignService, coinValidator: coinValidator, currencyValidator: currencyValidator}
+	return &CoinService{coinClient: coinClient, campaignService: campaignService, coinValidator: coinValidator, currencyValidator: currencyValidator}
 }
 
 func (c *CoinService) GetCurrentRate(currency string, coin string) (*domain.Price, error) {
@@ -98,21 +90,4 @@ func (c *CoinService) validateParameters(currency string, coin string) error {
 	}
 
 	return nil
-}
-
-func buildChainOfClients(clients []ICoinClient) ICoinClient {
-	if len(clients) == 0 {
-		return nil
-	} else if len(clients) == 1 {
-		return clients[0]
-	}
-
-	returnedClient := clients[len(clients)-1]
-	for i := len(clients) - 2; i >= 0; i-- {
-		client := clients[i]
-		client.SetNext(returnedClient)
-		returnedClient = client
-	}
-
-	return returnedClient
 }
