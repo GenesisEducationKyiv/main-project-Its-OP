@@ -2,17 +2,18 @@ package web
 
 import (
 	"btcRate/docs"
+	"btcRate/infrastructure"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"io"
 	"log"
 	"net/http"
 )
 
 type ServerManager struct {
+	client infrastructure.IHttpClient
 }
 
 type Response[T any] struct {
@@ -22,11 +23,15 @@ type Response[T any] struct {
 	Successful   bool
 }
 
-func (*ServerManager) RunServer(storageFile string) (func() error, error) {
+func NewServerManager() ServerManager {
+	return ServerManager{infrastructure.NewHttpClient(nil)}
+}
+
+func (*ServerManager) RunServer(emailStorageFile string, logStorageFile string) (func() error, error) {
 	r := gin.Default()
 	r.Use(errorHandlingMiddleware())
 
-	btcUahController, err := newBtcUahController(storageFile)
+	btcUahController, err := newBtcUahController(emailStorageFile, logStorageFile)
 	if err != nil {
 		return nil, err
 	}
@@ -67,40 +72,21 @@ func (s *ServerManager) GetRate(host string) (*Response[int], error) {
 		return nil, err
 	}
 
-	body, statusCode, err := s.sendRequest(req)
+	resp, err := s.client.SendRequest(req)
 	if err != nil {
 		return nil, err
 	}
 
-	if isSuccessful(statusCode) {
+	if isSuccessful(resp.Code) {
 		var result int
-		err = json.Unmarshal(body, &result)
+		err = json.Unmarshal(resp.Body, &result)
 		if err != nil {
 			return nil, err
 		}
-		return &Response[int]{Code: statusCode, Body: &result, ErrorMessage: "", Successful: true}, nil
+		return &Response[int]{Code: resp.Code, Body: &result, ErrorMessage: "", Successful: true}, nil
 	}
 
-	return &Response[int]{Code: statusCode, ErrorMessage: string(body), Successful: false}, nil
-}
-
-func (*ServerManager) sendRequest(req *http.Request) ([]byte, int, error) {
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	if err = resp.Body.Close(); err != nil {
-		return nil, 0, err
-	}
-
-	return body, resp.StatusCode, nil
+	return &Response[int]{Code: resp.Code, ErrorMessage: string(resp.Body), Successful: false}, nil
 }
 
 func isSuccessful(code int) bool {

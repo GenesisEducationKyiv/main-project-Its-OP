@@ -2,9 +2,13 @@ package web
 
 import (
 	"btcRate/application"
+	"btcRate/application/proxies"
+	"btcRate/application/services"
 	"btcRate/application/validators"
 	"btcRate/domain"
-	"btcRate/infrastructure"
+	"btcRate/infrastructure/factories"
+	"btcRate/infrastructure/integrations"
+	"btcRate/infrastructure/repositories"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
 	"net/http"
@@ -24,26 +28,34 @@ type btcUahController struct {
 	coin            string
 }
 
-func newBtcUahController(storageFile string) (*btcUahController, error) {
+func newBtcUahController(emailStorageFile string, logStorageFile string) (*btcUahController, error) {
 	supportedCurrency := "UAH"
 	supportedCoin := "BTC"
 
-	var emailRepository, err = infrastructure.NewFileEmailRepository(storageFile)
+	var emailRepository, err = repositories.NewFileEmailRepository(emailStorageFile)
 	if err != nil {
 		return nil, err
 	}
 
-	var bitcoinClient = infrastructure.NewBinanceClient()
+	logRepository := repositories.NewFileLogRepository(logStorageFile)
+
+	binanceFactory := factories.NewBinanceClientFactory(logRepository)
+	coinbaseFactory := factories.NewCoinbaseClientFactory(logRepository)
+	bitfinexFactory := factories.NewBitfinexClientFactory(logRepository)
+	coinClientFactories := []services.ICoinClientFactory{binanceFactory, coinbaseFactory, bitfinexFactory}
+
+	chainedCoinClientFactory := proxies.NewChainedCoinClientFactory(coinClientFactories)
+
 	var sendgrid = sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
-	var emailClient = infrastructure.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
+	var emailClient = integrations.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
 
 	var emailValidator = &validators.EmailValidator{}
 	var supportedCoinValidator = validators.NewSupportedCoinValidator([]string{supportedCoin})
 	var supportedCurrencyValidator = validators.NewSupportedCurrencyValidator([]string{supportedCurrency})
 
-	var campaignService = application.NewCampaignService(emailRepository, emailClient, emailValidator)
+	var campaignService = services.NewCampaignService(emailRepository, emailClient, emailValidator)
 
-	var btcUahService = application.NewCoinService(bitcoinClient, campaignService, supportedCoinValidator, supportedCurrencyValidator)
+	var btcUahService = services.NewCoinService(chainedCoinClientFactory, campaignService, supportedCoinValidator, supportedCurrencyValidator)
 
 	controller := &btcUahController{coinService: btcUahService, campaignService: campaignService, currency: supportedCurrency, coin: supportedCoin}
 

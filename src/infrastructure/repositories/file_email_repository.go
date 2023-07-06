@@ -1,11 +1,10 @@
-package infrastructure
+package repositories
 
 import (
 	"btcRate/domain"
 	"fmt"
 	"github.com/emirpasic/gods/sets/hashset"
 	"os"
-	"path/filepath"
 )
 
 type FileEmailRepository struct {
@@ -76,34 +75,5 @@ func (r *FileEmailRepository) Save() error {
 		return err
 	}
 
-	return nil
-}
-
-func fileExists(filePath string) bool {
-	info, err := os.Stat(filePath)
-	if os.IsNotExist(err) {
-		return false
-	}
-
-	return !info.IsDir()
-}
-
-func createFile(filePath string) error {
-	dirPath := filepath.Dir(filePath)
-
-	permissionCode := 0755
-
-	err := os.MkdirAll(dirPath, os.FileMode(permissionCode))
-
-	if err != nil {
-		return err
-	}
-
-	file, err := os.Create(filePath)
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
 	return nil
 }

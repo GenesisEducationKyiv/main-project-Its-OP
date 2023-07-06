@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	server := web.ServerManager{}
-	stop, err := server.RunServer("./data/emails.json")
+	server := web.NewServerManager()
+	stop, err := server.RunServer("./data/emails.json", "./data/logs.csv")
 	if err != nil {
 		log.Fatal(err)
 	}
