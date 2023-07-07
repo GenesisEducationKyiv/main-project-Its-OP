@@ -13,6 +13,7 @@ import (
 	"github.com/sendgrid/sendgrid-go"
 	"net/http"
 	"os"
+	"sync"
 )
 
 // @title GSES2 BTC application API
@@ -32,7 +33,9 @@ func newBtcUahController(emailStorageFile string, logStorageFile string) (*btcUa
 	supportedCurrency := "UAH"
 	supportedCoin := "BTC"
 
-	var emailRepository, err = repositories.NewFileEmailRepository(emailStorageFile)
+	emailMutex := &sync.RWMutex{}
+
+	var emailRepository, err = repositories.NewFileEmailRepository(emailStorageFile, emailMutex)
 	if err != nil {
 		return nil, err
 	}
