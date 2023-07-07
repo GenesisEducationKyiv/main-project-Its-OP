@@ -32,8 +32,8 @@ jobs:
       run: go build -v ./...
       working-directory: ./src
 
-    - name: TestCode
-      run: arch-go
+    - name: Test
+      run: go test -v ./...
       working-directory: ./src
 
   golangci:
