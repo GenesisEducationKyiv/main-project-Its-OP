@@ -32,8 +32,16 @@ jobs:
       run: go build -v ./...
       working-directory: ./src
 
-    - name: Test
+    - name: Test Code
       run: go test -v ./...
+      working-directory: ./src
+
+    - name: Install arch-go
+      run: go install -v github.com/fdaines/arch-go@latest
+      working-directory: ./src
+
+    - name: Test Architecture
+      run: arch-go
       working-directory: ./src
 
   golangci:
