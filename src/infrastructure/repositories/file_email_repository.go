@@ -2,18 +2,18 @@ package repositories
 
 import (
 	"btcRate/domain"
+	"encoding/json"
 	"fmt"
-	"github.com/emirpasic/gods/sets/hashset"
 	"os"
 )
 
 type FileEmailRepository struct {
-	emails      hashset.Set
+	emails      map[string]struct{}
 	storageFile string
 }
 
 func NewFileEmailRepository(storageFile string) (*FileEmailRepository, error) {
-	emails := *hashset.New()
+	emails := map[string]struct{}{}
 
 	if fileExists(storageFile) {
 		data, err := os.ReadFile(storageFile)
@@ -21,7 +21,7 @@ func NewFileEmailRepository(storageFile string) (*FileEmailRepository, error) {
 			return nil, err
 		}
 
-		err = emails.FromJSON(data)
+		err = json.Unmarshal(data, &emails)
 		if err != nil {
 			return nil, err
 		}
@@ -32,11 +32,11 @@ func NewFileEmailRepository(storageFile string) (*FileEmailRepository, error) {
 }
 
 func (r *FileEmailRepository) AddEmail(email string) error {
-	if r.emails.Contains(email) {
+	if _, exists := r.emails[email]; exists {
 		return &domain.DataConsistencyError{Message: fmt.Sprintf("Email address '%s' is already present in the database", email)}
 	}
 
-	r.emails.Add(email)
+	r.emails[email] = struct{}{}
 	return nil
 }
 
@@ -45,18 +45,16 @@ func (r *FileEmailRepository) GetAll() []string {
 		return []string{}
 	}
 
-	values := r.emails.Values()
-
-	emailsArray := make([]string, len(values))
-	for i, value := range values {
-		emailsArray[i] = value.(string)
+	var emails []string
+	for email := range r.emails {
+		emails = append(emails, email)
 	}
 
-	return emailsArray
+	return emails
 }
 
 func (r *FileEmailRepository) Save() error {
-	data, err := r.emails.MarshalJSON()
+	data, err := json.Marshal(r.emails)
 	if err != nil {
 		return err
 	}
