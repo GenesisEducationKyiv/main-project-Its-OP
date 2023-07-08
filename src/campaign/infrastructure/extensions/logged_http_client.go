@@ -1,7 +1,7 @@
 package extensions
 
 import (
-	"coin/infrastructure"
+	"campaign/infrastructure"
 	"fmt"
 	"net/http"
 	"time"

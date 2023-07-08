@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"coin/domain"
+	"campaign/domain"
 	"encoding/json"
 	"fmt"
 	"os"

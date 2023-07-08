@@ -86,7 +86,7 @@ func (c *campaignController) subscribe(context *gin.Context) {
 // @Success 200 {object} string "E-mails sent"
 // @Router /sendEmails [post]
 func (c *campaignController) sendEmails(context *gin.Context) {
-	err := c.campaignService.SendRateEmails()
+	err := c.campaignService.SendRateEmails("BTC", "UAH")
 	if err != nil {
 		_ = context.Error(err)
 		return
