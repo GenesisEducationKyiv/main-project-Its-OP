@@ -16,7 +16,7 @@ type IEmailClient interface {
 }
 
 type IRateProvider interface {
-	GetRate(currency string, coin string) (domain.Rate, error)
+	GetRate() (domain.Rate, error)
 }
 
 type CampaignService struct {
@@ -39,8 +39,8 @@ func (c *CampaignService) Subscribe(email string) error {
 	return nil
 }
 
-func (c *CampaignService) SendRateEmails(currency string, coin string) error {
-	currentPrice, err := c.rateProvider.GetRate(currency, coin)
+func (c *CampaignService) SendRateEmails() error {
+	currentPrice, err := c.rateProvider.GetRate()
 	if err != nil {
 		return err
 	}
