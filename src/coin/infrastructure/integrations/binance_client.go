@@ -2,8 +2,8 @@ package integrations
 
 import (
 	"btcRate/coin/application"
-	"btcRate/coin/domain"
-	"btcRate/coin/infrastructure"
+	"btcRate/common/domain"
+	"btcRate/common/infrastructure"
 	"encoding/json"
 	"fmt"
 	"net/http"

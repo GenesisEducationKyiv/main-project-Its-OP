@@ -62,7 +62,3 @@ func (*ServerManager) RunServer(emailStorageFile string, logStorageFile string) 
 
 	return stop, nil
 }
-
-func isSuccessful(code int) bool {
-	return code >= http.StatusOK && code < http.StatusBadRequest
-}

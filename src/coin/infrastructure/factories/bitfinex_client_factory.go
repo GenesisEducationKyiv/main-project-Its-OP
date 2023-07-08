@@ -2,9 +2,9 @@ package factories
 
 import (
 	"btcRate/coin/application"
-	"btcRate/coin/infrastructure"
-	"btcRate/coin/infrastructure/extensions"
 	"btcRate/coin/infrastructure/integrations"
+	"btcRate/common/infrastructure"
+	"btcRate/common/infrastructure/extensions"
 )
 
 type BitfinexClientFactory struct {
