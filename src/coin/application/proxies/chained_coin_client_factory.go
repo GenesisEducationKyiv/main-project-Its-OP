@@ -1,16 +1,18 @@
 package proxies
 
-import "coin/application/services"
+import (
+	"coin/application"
+)
 
 type ChainedCoinClientFactory struct {
-	factories []services.ICoinClientFactory
+	factories []application.ICoinClientFactory
 }
 
-func NewChainedCoinClientFactory(cfs []services.ICoinClientFactory) *ChainedCoinClientFactory {
+func NewChainedCoinClientFactory(cfs []application.ICoinClientFactory) *ChainedCoinClientFactory {
 	return &ChainedCoinClientFactory{factories: cfs}
 }
 
-func (f *ChainedCoinClientFactory) CreateClient() services.ICoinClient {
+func (f *ChainedCoinClientFactory) CreateClient() application.ICoinClient {
 	if len(f.factories) == 0 {
 		return nil
 	} else if len(f.factories) == 1 {

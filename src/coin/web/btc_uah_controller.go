@@ -1,8 +1,8 @@
 package web
 
 import (
+	"coin/application"
 	"coin/application/proxies"
-	"coin/application/services"
 	"coin/application/validators"
 	"coin/domain"
 	"coin/infrastructure/factories"
@@ -32,14 +32,14 @@ func newBtcUahController(logStorageFile string) (*btcUahController, error) {
 	binanceFactory := factories.NewBinanceClientFactory(logRepository)
 	coinbaseFactory := factories.NewCoinbaseClientFactory(logRepository)
 	bitfinexFactory := factories.NewBitfinexClientFactory(logRepository)
-	coinClientFactories := []services.ICoinClientFactory{binanceFactory, coinbaseFactory, bitfinexFactory}
+	coinClientFactories := []application.ICoinClientFactory{binanceFactory, coinbaseFactory, bitfinexFactory}
 
 	chainedCoinClientFactory := proxies.NewChainedCoinClientFactory(coinClientFactories)
 
 	var supportedCoinValidator = validators.NewSupportedCoinValidator([]string{supportedCoin})
 	var supportedCurrencyValidator = validators.NewSupportedCurrencyValidator([]string{supportedCurrency})
 
-	var btcUahService = services.NewCoinService(chainedCoinClientFactory, supportedCoinValidator, supportedCurrencyValidator)
+	var btcUahService = application.NewCoinService(chainedCoinClientFactory, supportedCoinValidator, supportedCurrencyValidator)
 
 	controller := &btcUahController{coinService: btcUahService, currency: supportedCurrency, coin: supportedCoin}
 

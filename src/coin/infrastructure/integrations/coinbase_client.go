@@ -1,7 +1,7 @@
 package integrations
 
 import (
-	"coin/application/services"
+	"coin/application"
 	"coin/domain"
 	"coin/infrastructure"
 	"encoding/json"
@@ -22,7 +22,7 @@ func NewCoinbaseClient(client infrastructure.IHttpClient) *CoinbaseClient {
 	return &CoinbaseClient{client: client, baseURL: baseUrl}
 }
 
-func (c *CoinbaseClient) GetRate(currency string, coin string) (*services.SpotPrice, error) {
+func (c *CoinbaseClient) GetRate(currency string, coin string) (*application.SpotPrice, error) {
 	path := fmt.Sprintf("/prices/%s-%s/spot", coin, currency)
 	url := c.baseURL.String() + path
 
@@ -49,7 +49,7 @@ func (c *CoinbaseClient) GetRate(currency string, coin string) (*services.SpotPr
 		return nil, err
 	}
 
-	return &services.SpotPrice{Amount: price, Timestamp: timestamp}, err
+	return &application.SpotPrice{Amount: price, Timestamp: timestamp}, err
 }
 
 type coinbaseResponse struct {

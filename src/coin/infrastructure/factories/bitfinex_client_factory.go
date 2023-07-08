@@ -1,7 +1,7 @@
 package factories
 
 import (
-	"coin/application/services"
+	"coin/application"
 	"coin/infrastructure"
 	"coin/infrastructure/extensions"
 	"coin/infrastructure/integrations"
@@ -15,7 +15,7 @@ func NewBitfinexClientFactory(logRepository extensions.ILogRepository) *Bitfinex
 	return &BitfinexClientFactory{logRepository: logRepository}
 }
 
-func (f *BitfinexClientFactory) CreateClient() services.ICoinClient {
+func (f *BitfinexClientFactory) CreateClient() application.ICoinClient {
 	httpClient := infrastructure.NewHttpClient(nil)
 	loggedHttpClient := extensions.NewLoggedHttpClient(httpClient, f.logRepository)
 

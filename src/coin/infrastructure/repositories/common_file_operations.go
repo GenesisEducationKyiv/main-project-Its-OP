@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 )
 
-func fileExists(filePath string) bool {
+func FileExists(filePath string) bool {
 	info, err := os.Stat(filePath)
 	if os.IsNotExist(err) {
 		return false
@@ -14,7 +14,7 @@ func fileExists(filePath string) bool {
 	return !info.IsDir()
 }
 
-func createFile(filePath string) error {
+func CreateFile(filePath string) error {
 	dirPath := filepath.Dir(filePath)
 
 	permissionCode := 0755

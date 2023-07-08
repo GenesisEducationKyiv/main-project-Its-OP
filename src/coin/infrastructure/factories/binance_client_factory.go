@@ -1,7 +1,7 @@
 package factories
 
 import (
-	"coin/application/services"
+	"coin/application"
 	"coin/infrastructure"
 	"coin/infrastructure/extensions"
 	"coin/infrastructure/integrations"
@@ -15,7 +15,7 @@ func NewBinanceClientFactory(logRepository extensions.ILogRepository) *BinanceCl
 	return &BinanceClientFactory{logRepository: logRepository}
 }
 
-func (f *BinanceClientFactory) CreateClient() services.ICoinClient {
+func (f *BinanceClientFactory) CreateClient() application.ICoinClient {
 	httpClient := infrastructure.NewHttpClient(nil)
 	loggedHttpClient := extensions.NewLoggedHttpClient(httpClient, f.logRepository)
 

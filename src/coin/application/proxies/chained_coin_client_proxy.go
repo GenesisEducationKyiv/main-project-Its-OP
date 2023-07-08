@@ -1,17 +1,19 @@
 package proxies
 
-import "coin/application/services"
+import (
+	"coin/application"
+)
 
 type chainedCoinClientProxy struct {
-	client services.ICoinClient
-	next   services.ICoinClient
+	client application.ICoinClient
+	next   application.ICoinClient
 }
 
-func newChainedCoinClientProxy(client services.ICoinClient, next services.ICoinClient) *chainedCoinClientProxy {
+func newChainedCoinClientProxy(client application.ICoinClient, next application.ICoinClient) *chainedCoinClientProxy {
 	return &chainedCoinClientProxy{client: client, next: next}
 }
 
-func (c *chainedCoinClientProxy) GetRate(currency string, coin string) (*services.SpotPrice, error) {
+func (c *chainedCoinClientProxy) GetRate(currency string, coin string) (*application.SpotPrice, error) {
 	price, err := c.client.GetRate(currency, coin)
 
 	if err != nil && c.next != nil {

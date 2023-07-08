@@ -1,7 +1,7 @@
 package integrations
 
 import (
-	"coin/application/services"
+	"coin/application"
 	"coin/domain"
 	"coin/infrastructure"
 	"encoding/json"
@@ -22,7 +22,7 @@ func NewBinanceClient(client infrastructure.IHttpClient) *BinanceClient {
 	return &BinanceClient{client: client, baseURL: baseUrl}
 }
 
-func (b *BinanceClient) GetRate(currency string, coin string) (*services.SpotPrice, error) {
+func (b *BinanceClient) GetRate(currency string, coin string) (*application.SpotPrice, error) {
 	path := fmt.Sprintf("/ticker/price?symbol=%s%s", coin, currency)
 	url := b.baseURL.String() + path
 
@@ -49,7 +49,7 @@ func (b *BinanceClient) GetRate(currency string, coin string) (*services.SpotPri
 		return nil, err
 	}
 
-	return &services.SpotPrice{Amount: price, Timestamp: timestamp}, nil
+	return &application.SpotPrice{Amount: price, Timestamp: timestamp}, nil
 }
 
 type binanceResponse struct {
