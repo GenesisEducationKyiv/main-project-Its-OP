@@ -1,4 +1,4 @@
-module campaign
+module btcRate/campaign
 
 go 1.20
 
