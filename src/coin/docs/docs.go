@@ -41,76 +41,18 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/sendEmails": {
-            "post": {
-                "description": "Send the current BTC to UAH rate to all subscribed emails",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "subscription"
-                ],
-                "summary": "Send email with BTC rate",
-                "responses": {
-                    "200": {
-                        "description": "E-mails sent",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/subscribe": {
-            "post": {
-                "description": "Add an email to the database if it does not exist already",
-                "consumes": [
-                    "application/x-www-form-urlencoded"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "subscription"
-                ],
-                "summary": "Subscribe email to get BTC rate",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Email to be subscribed",
-                        "name": "email",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "E-mail added",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "409": {
-                        "description": "E-mail already exists in the database",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
         }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0.0",
-	Host:             "localhost:8080",
-	BasePath:         "/api",
+	Version:          "",
+	Host:             "",
+	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "GSES2 BTC application API",
-	Description:      "This is a sample server for a BTC to UAH rate application.",
+	Title:            "",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

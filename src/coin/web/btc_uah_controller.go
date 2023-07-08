@@ -47,7 +47,7 @@ func newBtcUahController(logStorageFile string) (*btcUahController, error) {
 }
 
 // @Summary Get current BTC to UAH rate
-// @Description Get the current rate of BTC to UAH using any third-party coinService with public API
+// @Description Get the current rate of BTC to UAH using any third-party service with public API
 // @Tags rate
 // @Produce  json
 // @Success 200 {number} number "Successful operation"
