@@ -1,7 +1,7 @@
 package web
 
 import (
-	"btcRate/coin/domain"
+	"btcRate/common/domain"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
