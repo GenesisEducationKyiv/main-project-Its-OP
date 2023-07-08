@@ -11,13 +11,13 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy the source code from the current directory to the Working Directory inside the container
-COPY ./application ./application
-COPY ./domain ./domain
-COPY ./infrastructure ./infrastructure
-COPY ./web ./web
+COPY application ./application
+COPY domain ./domain
+COPY infrastructure ./infrastructure
+COPY web ./web
 
-COPY ./docs ./docs
-COPY ./startup.go .
+COPY docs ./docs
+COPY startup.go .
 
 # Build the Go app
 RUN go build -o main startup.go
