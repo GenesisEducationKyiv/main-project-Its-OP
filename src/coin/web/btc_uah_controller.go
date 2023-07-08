@@ -6,7 +6,7 @@ import (
 	"btcRate/coin/application/validators"
 	"btcRate/coin/domain"
 	"btcRate/coin/infrastructure/factories"
-	"btcRate/coin/infrastructure/repositories"
+	"btcRate/common/infrastructure/repositories"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

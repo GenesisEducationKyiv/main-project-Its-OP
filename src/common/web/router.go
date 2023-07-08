@@ -1,8 +1,8 @@
 package web
 
 const (
-	apiBasePath        = "/api/v1"
-	getRate     string = "/rate"
-	subscribe   string = "/subscribe"
-	sendEmails  string = "/sendEmails"
+	ApiBasePath        = "/api/v1"
+	GetRate     string = "/rate"
+	Subscribe   string = "/subscribe"
+	SendEmails  string = "/sendEmails"
 )

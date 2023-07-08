@@ -2,7 +2,8 @@ package web
 
 import (
 	"btcRate/coin/docs"
-	"btcRate/coin/infrastructure"
+	"btcRate/common/infrastructure"
+	"btcRate/common/web"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
@@ -22,17 +23,17 @@ func NewServerManager() ServerManager {
 
 func (*ServerManager) RunServer(logStorageFile string) (func() error, error) {
 	r := gin.Default()
-	r.Use(errorHandlingMiddleware())
+	r.Use(web.ErrorHandlingMiddleware())
 
 	btcUahController, err := newBtcUahController(logStorageFile)
 	if err != nil {
 		return nil, err
 	}
 
-	docs.SwaggerInfo.BasePath = apiBasePath
-	api := r.Group(apiBasePath)
+	docs.SwaggerInfo.BasePath = web.ApiBasePath
+	api := r.Group(web.ApiBasePath)
 	{
-		api.GET(getRate, btcUahController.getRate)
+		api.GET(web.GetRate, btcUahController.getRate)
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
@@ -55,8 +56,8 @@ func (*ServerManager) RunServer(logStorageFile string) (func() error, error) {
 	return stop, nil
 }
 
-func (s *ServerManager) GetRate(host string) (*Response[int], error) {
-	url := host + apiBasePath + getRate
+func (s *ServerManager) GetRate(host string) (*web.Response[int], error) {
+	url := host + web.ApiBasePath + web.GetRate
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -74,10 +75,10 @@ func (s *ServerManager) GetRate(host string) (*Response[int], error) {
 		if err != nil {
 			return nil, err
 		}
-		return &Response[int]{Code: resp.Code, Body: &result, ErrorMessage: "", Successful: true}, nil
+		return &web.Response[int]{Code: resp.Code, Body: &result, ErrorMessage: "", Successful: true}, nil
 	}
 
-	return &Response[int]{Code: resp.Code, ErrorMessage: string(resp.Body), Successful: false}, nil
+	return &web.Response[int]{Code: resp.Code, ErrorMessage: string(resp.Body), Successful: false}, nil
 }
 
 func isSuccessful(code int) bool {

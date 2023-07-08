@@ -8,7 +8,7 @@ import (
 
 const defaultErrorMessage = "Internal server error. Please try again later."
 
-func errorHandlingMiddleware() gin.HandlerFunc {
+func ErrorHandlingMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
 
