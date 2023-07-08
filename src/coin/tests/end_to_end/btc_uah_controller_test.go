@@ -3,7 +3,7 @@
 package end_to_end
 
 import (
-	"btcRate/web"
+	"coin/web"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"

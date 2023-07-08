@@ -1,6 +1,6 @@
 package services
 
-import "btcRate/application"
+import "coin/application"
 
 type IEmailRepository interface {
 	AddEmail(email string) error

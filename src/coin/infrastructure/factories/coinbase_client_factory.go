@@ -1,10 +1,10 @@
 package factories
 
 import (
-	"btcRate/application/services"
-	"btcRate/infrastructure"
-	"btcRate/infrastructure/extensions"
-	"btcRate/infrastructure/integrations"
+	"coin/application/services"
+	"coin/infrastructure"
+	"coin/infrastructure/extensions"
+	"coin/infrastructure/integrations"
 )
 
 type CoinbaseClientFactory struct {

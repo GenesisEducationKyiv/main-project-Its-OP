@@ -1,8 +1,8 @@
 package services
 
 import (
-	"btcRate/application"
-	"btcRate/domain"
+	"coin/application"
+	"coin/domain"
 	"fmt"
 	"time"
 )

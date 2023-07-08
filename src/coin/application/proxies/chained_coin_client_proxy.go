@@ -1,6 +1,6 @@
 package proxies
 
-import "btcRate/application/services"
+import "coin/application/services"
 
 type chainedCoinClientProxy struct {
 	client services.ICoinClient

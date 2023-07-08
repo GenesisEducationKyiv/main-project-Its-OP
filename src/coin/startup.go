@@ -1,7 +1,7 @@
 package main
 
 import (
-	"btcRate/web"
+	"coin/web"
 	"log"
 	"os"
 	"os/signal"

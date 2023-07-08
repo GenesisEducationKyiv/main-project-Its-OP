@@ -1,14 +1,14 @@
 package web
 
 import (
-	"btcRate/application"
-	"btcRate/application/proxies"
-	"btcRate/application/services"
-	"btcRate/application/validators"
-	"btcRate/domain"
-	"btcRate/infrastructure/factories"
-	"btcRate/infrastructure/integrations"
-	"btcRate/infrastructure/repositories"
+	"coin/application"
+	"coin/application/proxies"
+	"coin/application/services"
+	"coin/application/validators"
+	"coin/domain"
+	"coin/infrastructure/factories"
+	"coin/infrastructure/integrations"
+	"coin/infrastructure/repositories"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
 	"net/http"

@@ -1,4 +1,4 @@
-module btcRate
+module coin
 
 go 1.20
 

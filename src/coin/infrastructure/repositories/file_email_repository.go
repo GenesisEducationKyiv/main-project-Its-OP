@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"btcRate/domain"
+	"coin/domain"
 	"encoding/json"
 	"fmt"
 	"os"
