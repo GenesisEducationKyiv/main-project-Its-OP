@@ -18,7 +18,7 @@ func NewRateProvider(client infrastructure.IHttpClient) *RateProvider {
 	return &RateProvider{client: client, baseURL: baseUrl}
 }
 
-func (*RateProvider) GetRate() (domain.Rate, error) {
+func (*RateProvider) GetRate(currency string, coin string) (domain.Rate, error) {
 	// TODO: implement proper rate fetching
 	return domain.Rate{Amount: 1000, Timestamp: time.Now()}, nil
 }

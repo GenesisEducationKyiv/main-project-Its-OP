@@ -4,7 +4,10 @@ import (
 	"campaign/application"
 	"campaign/application/validators"
 	"campaign/domain"
+	"campaign/infrastructure"
+	"campaign/infrastructure/extensions"
 	"campaign/infrastructure/integrations"
+	"campaign/infrastructure/providers"
 	"campaign/infrastructure/repositories"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
@@ -41,11 +44,16 @@ func newCampaignController(emailStorageFile string, logStorageFile string) (*cam
 	var sendgrid = sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
 	var emailClient = integrations.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
 
-	var emailValidator = validators.EmailValidator{}
+	httpClient := infrastructure.NewHttpClient(nil)
+	loggedHttpClient := extensions.NewLoggedHttpClient(httpClient, logRepository)
 
-	var campaignService = application.NewCampaignService(emailRepository, emailClient, emailValidator)
+	var emailValidator = &validators.EmailValidator{}
 
-	controller := &campaignController{campaignService: campaignService, campaignService: campaignService, currency: supportedCurrency, coin: supportedCoin}
+	var rateProvider = providers.NewRateProvider(loggedHttpClient)
+
+	var campaignService = application.NewCampaignService(emailRepository, emailClient, rateProvider, emailValidator)
+
+	controller := &campaignController{campaignService: campaignService, currency: supportedCurrency, coin: supportedCoin}
 
 	return controller, nil
 }

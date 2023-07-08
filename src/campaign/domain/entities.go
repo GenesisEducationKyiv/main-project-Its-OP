@@ -1,8 +1,11 @@
 package domain
 
+import "time"
+
 type Rate struct {
-	Amount   float64
-	Currency string
+	Amount    float64
+	Timestamp time.Time
+	Currency  string
 }
 
 type MailBody struct {

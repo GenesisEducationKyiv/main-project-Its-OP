@@ -2,6 +2,7 @@ package application
 
 import (
 	"campaign/domain"
+	"fmt"
 )
 
 type IEmailRepository interface {
@@ -18,7 +19,7 @@ type IValidator[T any] interface {
 }
 
 type IRateProvider interface {
-	GetRate() (domain.Rate, error)
+	GetRate(currency string, coin string) (domain.Rate, error)
 }
 
 type CampaignService struct {
@@ -28,17 +29,31 @@ type CampaignService struct {
 	emailValidator  IValidator[string]
 }
 
-func NewCampaignService(repository IEmailRepository, client IEmailClient, rateProvider IRateProvider, emailValidator IValidator[string]) *CampaignService {
-	return &CampaignService{emailRepository: repository, emailClient: client, rateProvider: rateProvider, emailValidator: emailValidator}
+func NewCampaignService(r IEmailRepository, c IEmailClient, rP IRateProvider, emailV IValidator[string]) *CampaignService {
+	return &CampaignService{emailRepository: r, emailClient: c, rateProvider: rP, emailValidator: emailV}
 }
 
 func (c *CampaignService) Subscribe(email string) error {
-	err := c.emailValidator.Validate(email)
+	err := c.emailRepository.AddEmail(email)
 	if err != nil {
 		return err
 	}
 
-	err = c.emailRepository.AddEmail(email)
+	return nil
+}
+
+func (c *CampaignService) SendRateEmails(currency string, coin string) error {
+	currentPrice, err := c.rateProvider.GetRate(currency, coin)
+	if err != nil {
+		return err
+	}
+
+	htmlTemplate := `<p><strong>Amount:</strong> %f</p> <p><strong>Currency:</strong> %s<p> <p><strong>Timestamp:</strong> %s<p>`
+	htmlBody := fmt.Sprintf(htmlTemplate, currentPrice.Amount, currentPrice.Currency, currentPrice.Timestamp.Format("02-01-06 15:04:05.999 Z0700"))
+
+	mail := &domain.MailBody{Subject: "Current BTC to UAH rate", ReceiverAlias: "Rate Recipient", HtmlContent: htmlBody}
+
+	err = c.sendEmails(mail)
 	if err != nil {
 		return err
 	}

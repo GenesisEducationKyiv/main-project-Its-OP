@@ -63,9 +63,7 @@ func (c *CoinService) SendRateEmails(currency string, coin string) error {
 		return err
 	}
 
-	htmlTemplate := `<p><strong>Amount:</strong> %f</p>
-	<p><strong>Currency:</strong> %s<p>
-	<p><strong>Timestamp:</strong> %s<p>`
+	htmlTemplate := `<p><strong>Amount:</strong> %f</p> <p><strong>Currency:</strong> %s<p> <p><strong>Timestamp:</strong> %s<p>`
 	htmlBody := fmt.Sprintf(htmlTemplate, currentPrice.Amount, currentPrice.Currency, currentPrice.Timestamp.Format("02-01-06 15:04:05.999 Z0700"))
 
 	mail := &application.MailBody{Subject: "Current BTC to UAH rate", ReceiverAlias: "Rate Recipient", HtmlContent: htmlBody}
