@@ -1,6 +1,6 @@
 package domain
 
-type Price struct {
+type Rate struct {
 	Amount   float64
 	Currency string
 }
