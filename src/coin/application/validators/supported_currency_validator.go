@@ -1,7 +1,7 @@
 package validators
 
 import (
-	"btcRate/coin/domain"
+	"btcRate/common/domain"
 	"fmt"
 	"golang.org/x/exp/slices"
 )

@@ -2,7 +2,8 @@ package web
 
 import (
 	"btcRate/campaign/docs"
-	"btcRate/campaign/infrastructure"
+	"btcRate/common/infrastructure"
+	"btcRate/common/web"
 	"context"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -28,18 +29,18 @@ func NewServerManager() ServerManager {
 
 func (*ServerManager) RunServer(emailStorageFile string, logStorageFile string) (func() error, error) {
 	r := gin.Default()
-	r.Use(errorHandlingMiddleware())
+	r.Use(web.ErrorHandlingMiddleware())
 
 	campaignController, err := newCampaignController(emailStorageFile, logStorageFile)
 	if err != nil {
 		return nil, err
 	}
 
-	docs.SwaggerInfo.BasePath = apiBasePath
-	api := r.Group(apiBasePath)
+	docs.SwaggerInfo.BasePath = web.ApiBasePath
+	api := r.Group(web.ApiBasePath)
 	{
-		api.POST(subscribe, campaignController.subscribe)
-		api.POST(sendEmails, campaignController.sendEmails)
+		api.POST(web.Subscribe, campaignController.subscribe)
+		api.POST(web.SendEmails, campaignController.sendEmails)
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

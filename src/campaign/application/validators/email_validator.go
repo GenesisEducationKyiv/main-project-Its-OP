@@ -1,7 +1,7 @@
 package validators
 
 import (
-	"btcRate/campaign/domain"
+	"btcRate/common/domain"
 	"regexp"
 )
 

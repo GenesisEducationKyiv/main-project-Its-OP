@@ -1,7 +1,8 @@
 package repositories
 
 import (
-	"btcRate/campaign/domain"
+	"btcRate/common/domain"
+	"btcRate/common/infrastructure/repositories"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -17,7 +18,7 @@ type FileEmailRepository struct {
 func NewFileEmailRepository(storageFile string, mutex *sync.RWMutex) (*FileEmailRepository, error) {
 	emails := map[string]struct{}{}
 
-	if fileExists(storageFile) {
+	if repositories.FileExists(storageFile) {
 		data, err := os.ReadFile(storageFile)
 		if err != nil {
 			return nil, err
@@ -45,7 +46,7 @@ func (r *FileEmailRepository) AddEmail(email string) error {
 }
 
 func (r *FileEmailRepository) GetAll() []string {
-	if !fileExists(r.storageFile) {
+	if !repositories.FileExists(r.storageFile) {
 		return []string{}
 	}
 
@@ -74,8 +75,8 @@ func (r *FileEmailRepository) save() error {
 		return err
 	}
 
-	if !fileExists(r.storageFile) {
-		err = createFile(r.storageFile)
+	if !repositories.FileExists(r.storageFile) {
+		err = repositories.CreateFile(r.storageFile)
 		if err != nil {
 			return err
 		}

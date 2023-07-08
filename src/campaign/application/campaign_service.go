@@ -2,6 +2,7 @@ package application
 
 import (
 	"btcRate/campaign/domain"
+	"btcRate/common/application"
 	"fmt"
 )
 
@@ -22,10 +23,10 @@ type CampaignService struct {
 	emailRepository IEmailRepository
 	emailClient     IEmailClient
 	rateProvider    IRateProvider
-	emailValidator  IValidator[string]
+	emailValidator  application.IValidator[string]
 }
 
-func NewCampaignService(r IEmailRepository, c IEmailClient, rP IRateProvider, emailV IValidator[string]) *CampaignService {
+func NewCampaignService(r IEmailRepository, c IEmailClient, rP IRateProvider, emailV application.IValidator[string]) *CampaignService {
 	return &CampaignService{emailRepository: r, emailClient: c, rateProvider: rP, emailValidator: emailV}
 }
 

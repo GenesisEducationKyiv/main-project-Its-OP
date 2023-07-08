@@ -2,7 +2,7 @@ package providers
 
 import (
 	"btcRate/campaign/domain"
-	"btcRate/campaign/infrastructure"
+	"btcRate/common/infrastructure"
 	"net/url"
 	"time"
 )

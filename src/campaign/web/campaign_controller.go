@@ -4,11 +4,12 @@ import (
 	"btcRate/campaign/application"
 	"btcRate/campaign/application/validators"
 	"btcRate/campaign/domain"
-	"btcRate/campaign/infrastructure"
-	"btcRate/campaign/infrastructure/extensions"
 	"btcRate/campaign/infrastructure/integrations"
 	"btcRate/campaign/infrastructure/providers"
 	"btcRate/campaign/infrastructure/repositories"
+	"btcRate/common/infrastructure"
+	"btcRate/common/infrastructure/extensions"
+	commonRepositories "btcRate/common/infrastructure/repositories"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
 	"net/http"
@@ -39,7 +40,7 @@ func newCampaignController(emailStorageFile string, logStorageFile string) (*cam
 		return nil, err
 	}
 
-	logRepository := repositories.NewFileLogRepository(logStorageFile)
+	logRepository := commonRepositories.NewFileLogRepository(logStorageFile)
 
 	var sendgrid = sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
 	var emailClient = integrations.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
