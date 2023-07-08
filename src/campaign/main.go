@@ -1,7 +1,7 @@
 package main
 
 import (
-	"campaign/web"
+	"btcRate/campaign/web"
 	"log"
 	"os"
 	"os/signal"

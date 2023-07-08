@@ -1,7 +1,7 @@
 package integrations
 
 import (
-	"campaign/domain"
+	"btcRate/campaign/domain"
 	"fmt"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"

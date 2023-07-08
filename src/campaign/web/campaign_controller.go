@@ -1,14 +1,14 @@
 package web
 
 import (
-	"campaign/application"
-	"campaign/application/validators"
-	"campaign/domain"
-	"campaign/infrastructure"
-	"campaign/infrastructure/extensions"
-	"campaign/infrastructure/integrations"
-	"campaign/infrastructure/providers"
-	"campaign/infrastructure/repositories"
+	"btcRate/campaign/application"
+	"btcRate/campaign/application/validators"
+	"btcRate/campaign/domain"
+	"btcRate/campaign/infrastructure"
+	"btcRate/campaign/infrastructure/extensions"
+	"btcRate/campaign/infrastructure/integrations"
+	"btcRate/campaign/infrastructure/providers"
+	"btcRate/campaign/infrastructure/repositories"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
 	"net/http"

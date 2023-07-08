@@ -1,7 +1,7 @@
 package application
 
 import (
-	"campaign/domain"
+	"btcRate/campaign/domain"
 	"fmt"
 )
 

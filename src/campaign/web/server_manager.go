@@ -1,8 +1,8 @@
 package web
 
 import (
-	"campaign/docs"
-	"campaign/infrastructure"
+	"btcRate/campaign/docs"
+	"btcRate/campaign/infrastructure"
 	"context"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"

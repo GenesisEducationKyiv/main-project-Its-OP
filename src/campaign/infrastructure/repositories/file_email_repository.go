@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"campaign/domain"
+	"btcRate/campaign/domain"
 	"encoding/json"
 	"fmt"
 	"os"
