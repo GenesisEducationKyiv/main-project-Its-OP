@@ -1,7 +1,7 @@
 package proxies
 
 import (
-	"coin/application"
+	"btcRate/coin/application"
 )
 
 type chainedCoinClientProxy struct {

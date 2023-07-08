@@ -1,10 +1,10 @@
 package factories
 
 import (
-	"coin/application"
-	"coin/infrastructure"
-	"coin/infrastructure/extensions"
-	"coin/infrastructure/integrations"
+	"btcRate/coin/application"
+	"btcRate/coin/infrastructure"
+	"btcRate/coin/infrastructure/extensions"
+	"btcRate/coin/infrastructure/integrations"
 )
 
 type BinanceClientFactory struct {

@@ -1,8 +1,8 @@
 package web
 
 import (
-	"coin/docs"
-	"coin/infrastructure"
+	"btcRate/coin/docs"
+	"btcRate/coin/infrastructure"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"

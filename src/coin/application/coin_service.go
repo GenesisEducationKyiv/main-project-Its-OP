@@ -1,7 +1,7 @@
 package application
 
 import (
-	"coin/domain"
+	"btcRate/coin/domain"
 	"time"
 )
 

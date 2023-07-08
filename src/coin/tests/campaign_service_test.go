@@ -1,10 +1,10 @@
 package tests
 
 import (
-	"coin/application/services"
-	"coin/application/validators"
-	"coin/domain"
-	"coin/infrastructure/repositories"
+	"btcRate/coin/application/services"
+	"btcRate/coin/application/validators"
+	"btcRate/coin/domain"
+	"btcRate/coin/infrastructure/repositories"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"sync"

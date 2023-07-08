@@ -1,12 +1,12 @@
 package web
 
 import (
-	"coin/application"
-	"coin/application/proxies"
-	"coin/application/validators"
-	"coin/domain"
-	"coin/infrastructure/factories"
-	"coin/infrastructure/repositories"
+	"btcRate/coin/application"
+	"btcRate/coin/application/proxies"
+	"btcRate/coin/application/validators"
+	"btcRate/coin/domain"
+	"btcRate/coin/infrastructure/factories"
+	"btcRate/coin/infrastructure/repositories"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

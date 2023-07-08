@@ -1,7 +1,7 @@
 package extensions
 
 import (
-	"coin/infrastructure"
+	"btcRate/coin/infrastructure"
 	"fmt"
 	"net/http"
 	"time"
