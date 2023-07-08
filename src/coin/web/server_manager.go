@@ -27,11 +27,11 @@ func NewServerManager() ServerManager {
 	return ServerManager{infrastructure.NewHttpClient(nil)}
 }
 
-func (*ServerManager) RunServer(emailStorageFile string, logStorageFile string) (func() error, error) {
+func (*ServerManager) RunServer(logStorageFile string) (func() error, error) {
 	r := gin.Default()
 	r.Use(errorHandlingMiddleware())
 
-	btcUahController, err := newBtcUahController(emailStorageFile, logStorageFile)
+	btcUahController, err := newBtcUahController(logStorageFile)
 	if err != nil {
 		return nil, err
 	}
@@ -40,8 +40,6 @@ func (*ServerManager) RunServer(emailStorageFile string, logStorageFile string) 
 	api := r.Group(apiBasePath)
 	{
 		api.GET(getRate, btcUahController.getRate)
-		api.POST(subscribe, btcUahController.subscribe)
-		api.POST(sendEmails, btcUahController.sendEmails)
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

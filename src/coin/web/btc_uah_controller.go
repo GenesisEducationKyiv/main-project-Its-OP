@@ -1,19 +1,14 @@
 package web
 
 import (
-	"coin/application"
 	"coin/application/proxies"
 	"coin/application/services"
 	"coin/application/validators"
 	"coin/domain"
 	"coin/infrastructure/factories"
-	"coin/infrastructure/integrations"
 	"coin/infrastructure/repositories"
 	"github.com/gin-gonic/gin"
-	"github.com/sendgrid/sendgrid-go"
 	"net/http"
-	"os"
-	"sync"
 )
 
 // @title GSES2 BTC application API
@@ -23,22 +18,14 @@ import (
 // @BasePath /api
 
 type btcUahController struct {
-	coinService     domain.ICoinService
-	campaignService application.ICampaignService
-	currency        string
-	coin            string
+	coinService domain.ICoinService
+	currency    string
+	coin        string
 }
 
-func newBtcUahController(emailStorageFile string, logStorageFile string) (*btcUahController, error) {
+func newBtcUahController(logStorageFile string) (*btcUahController, error) {
 	supportedCurrency := "UAH"
 	supportedCoin := "BTC"
-
-	emailMutex := &sync.RWMutex{}
-
-	var emailRepository, err = repositories.NewFileEmailRepository(emailStorageFile, emailMutex)
-	if err != nil {
-		return nil, err
-	}
 
 	logRepository := repositories.NewFileLogRepository(logStorageFile)
 
@@ -49,18 +36,12 @@ func newBtcUahController(emailStorageFile string, logStorageFile string) (*btcUa
 
 	chainedCoinClientFactory := proxies.NewChainedCoinClientFactory(coinClientFactories)
 
-	var sendgrid = sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
-	var emailClient = integrations.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
-
-	var emailValidator = &validators.EmailValidator{}
 	var supportedCoinValidator = validators.NewSupportedCoinValidator([]string{supportedCoin})
 	var supportedCurrencyValidator = validators.NewSupportedCurrencyValidator([]string{supportedCurrency})
 
-	var campaignService = services.NewCampaignService(emailRepository, emailClient, emailValidator)
+	var btcUahService = services.NewCoinService(chainedCoinClientFactory, supportedCoinValidator, supportedCurrencyValidator)
 
-	var btcUahService = services.NewCoinService(chainedCoinClientFactory, campaignService, supportedCoinValidator, supportedCurrencyValidator)
-
-	controller := &btcUahController{coinService: btcUahService, campaignService: campaignService, currency: supportedCurrency, coin: supportedCoin}
+	controller := &btcUahController{coinService: btcUahService, currency: supportedCurrency, coin: supportedCoin}
 
 	return controller, nil
 }
@@ -81,41 +62,4 @@ func (c *btcUahController) getRate(context *gin.Context) {
 	}
 
 	context.IndentedJSON(http.StatusOK, price.Amount)
-}
-
-// @Summary Subscribe email to get BTC rate
-// @Description Add an email to the database if it does not exist already
-// @Tags subscription
-// @Accept  x-www-form-urlencoded
-// @Produce  json
-// @Param email formData string true "Email to be subscribed"
-// @Success 200 {object} string "E-mail added"
-// @Failure 409 {object} string "E-mail already exists in the database"
-// @Router /subscribe [post]
-func (c *btcUahController) subscribe(context *gin.Context) {
-	email := context.PostForm("email")
-
-	err := c.campaignService.Subscribe(email)
-	if err != nil {
-		_ = context.Error(err)
-		return
-	}
-
-	context.String(http.StatusOK, "E-mail address added")
-}
-
-// @Summary Send email with BTC rate
-// @Description Send the current BTC to UAH rate to all subscribed emails
-// @Tags subscription
-// @Produce  json
-// @Success 200 {object} string "E-mails sent"
-// @Router /sendEmails [post]
-func (c *btcUahController) sendEmails(context *gin.Context) {
-	err := c.coinService.SendRateEmails(c.currency, c.coin)
-	if err != nil {
-		_ = context.Error(err)
-		return
-	}
-
-	context.String(http.StatusOK, "E-mails sent")
 }
