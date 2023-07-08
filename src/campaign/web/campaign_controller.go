@@ -16,7 +16,7 @@ import (
 // @title GSES2 BTC application API
 // @version 1.0.0
 // @description This is a sample server for a BTC to UAH rate application.
-// @host localhost:8080
+// @host localhost:8081
 // @BasePath /api
 
 type campaignController struct {
