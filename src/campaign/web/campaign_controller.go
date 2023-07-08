@@ -10,9 +10,11 @@ import (
 	"btcRate/common/infrastructure"
 	"btcRate/common/infrastructure/extensions"
 	commonRepositories "btcRate/common/infrastructure/repositories"
+	"btcRate/common/web"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
 	"net/http"
+	"net/url"
 	"os"
 	"sync"
 )
@@ -50,7 +52,7 @@ func newCampaignController(emailStorageFile string, logStorageFile string) (*cam
 
 	var emailValidator = &validators.EmailValidator{}
 
-	var rateProvider = providers.NewRateProvider(loggedHttpClient)
+	var rateProvider = providers.NewRateProvider(loggedHttpClient, &url.URL{Host: "feature-coin:8080", Path: web.ApiBasePath})
 
 	var campaignService = application.NewCampaignService(emailRepository, emailClient, rateProvider, emailValidator)
 
@@ -87,7 +89,7 @@ func (c *campaignController) subscribe(context *gin.Context) {
 // @Success 200 {object} string "E-mails sent"
 // @Router /sendEmails [post]
 func (c *campaignController) sendEmails(context *gin.Context) {
-	err := c.campaignService.SendRateEmails("BTC", "UAH")
+	err := c.campaignService.SendRateEmails()
 	if err != nil {
 		_ = context.Error(err)
 		return

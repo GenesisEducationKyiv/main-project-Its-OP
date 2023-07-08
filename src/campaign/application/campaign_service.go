@@ -16,7 +16,7 @@ type IEmailClient interface {
 }
 
 type IRateProvider interface {
-	GetRate() (domain.Rate, error)
+	GetRate() (*domain.Rate, error)
 }
 
 type CampaignService struct {
