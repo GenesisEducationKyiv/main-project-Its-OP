@@ -42,7 +42,10 @@ func newCampaignController(emailStorageFile string, logStorageFile string) (*cam
 		return nil, err
 	}
 
-	logRepository := commonRepositories.NewFileLogRepository(logStorageFile)
+	logRepository, err := commonRepositories.NewFileLogRepository(logStorageFile)
+	if err != nil {
+		return nil, err
+	}
 
 	var sendgrid = sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
 	var emailClient = integrations.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))

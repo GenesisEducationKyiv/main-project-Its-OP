@@ -1,30 +1,30 @@
 # Start from the latest Golang base image
 FROM golang:latest
 
-# Copy the Common files
-WORKDIR /common
+WORKDIR /app/common
 
-COPY go.mod go.sum ./
+# Copy the Common files
+COPY ./common/go.mod ./common/go.sum ./
 RUN go mod download
 
-COPY ../common/application ./application
-COPY ../common/domain ./domain
-COPY ../common/infrastructure ./infrastructure
-COPY ../common/web ./web
+COPY ./common/application ./application
+COPY ./common/domain ./domain
+COPY ./common/infrastructure ./infrastructure
+COPY ./common/web ./web
 
 # Copy the feature-related files
-WORKDIR /app
+WORKDIR /app/campaign
 
-COPY go.mod go.sum ./
+COPY ./campaign/go.mod ./campaign/go.sum ./
 RUN go mod download
 
-COPY application ./application
-COPY domain ./domain
-COPY infrastructure ./infrastructure
-COPY web ./web
+COPY ./campaign/application ./application
+COPY ./campaign/domain ./domain
+COPY ./campaign/infrastructure ./infrastructure
+COPY ./campaign/web ./web
 
-COPY docs ./docs
-COPY startup.go .
+COPY ./campaign/docs ./docs
+COPY ./campaign/main.go .
 
 # Build the Go app
 RUN go build -o main main.go

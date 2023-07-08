@@ -9,8 +9,14 @@ type FileLogRepository struct {
 	storageFile string
 }
 
-func NewFileLogRepository(storageFile string) *FileLogRepository {
-	return &FileLogRepository{storageFile: storageFile}
+func NewFileLogRepository(storageFile string) (*FileLogRepository, error) {
+	if !FileExists(storageFile) {
+		err := CreateFile(storageFile)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &FileLogRepository{storageFile: storageFile}, nil
 }
 
 func (r *FileLogRepository) Log(data string) error {

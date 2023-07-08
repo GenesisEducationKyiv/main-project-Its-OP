@@ -27,7 +27,10 @@ func newBtcUahController(logStorageFile string) (*btcUahController, error) {
 	supportedCurrency := "UAH"
 	supportedCoin := "BTC"
 
-	logRepository := repositories.NewFileLogRepository(logStorageFile)
+	logRepository, err := repositories.NewFileLogRepository(logStorageFile)
+	if err != nil {
+		return nil, err
+	}
 
 	binanceFactory := factories.NewBinanceClientFactory(logRepository)
 	coinbaseFactory := factories.NewCoinbaseClientFactory(logRepository)
