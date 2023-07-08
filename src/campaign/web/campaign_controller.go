@@ -55,7 +55,7 @@ func newCampaignController(emailStorageFile string, logStorageFile string) (*cam
 
 	var emailValidator = &validators.EmailValidator{}
 
-	var rateProvider = providers.NewRateProvider(loggedHttpClient, &url.URL{Host: "feature-coin:8080", Path: web.ApiBasePath})
+	var rateProvider = providers.NewRateProvider(loggedHttpClient, &url.URL{Scheme: "http", Host: "feature-coin:8080", Path: web.ApiBasePath})
 
 	var campaignService = application.NewCampaignService(emailRepository, emailClient, rateProvider, emailValidator)
 
