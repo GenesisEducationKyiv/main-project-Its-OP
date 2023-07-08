@@ -16,13 +16,6 @@ type ServerManager struct {
 	client infrastructure.IHttpClient
 }
 
-type Response[T any] struct {
-	Code         int
-	Body         *T
-	ErrorMessage string
-	Successful   bool
-}
-
 func NewServerManager() ServerManager {
 	return ServerManager{infrastructure.NewHttpClient(nil)}
 }
