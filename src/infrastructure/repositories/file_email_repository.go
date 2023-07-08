@@ -2,18 +2,20 @@ package repositories
 
 import (
 	"btcRate/domain"
+	"encoding/json"
 	"fmt"
-	"github.com/emirpasic/gods/sets/hashset"
 	"os"
+	"sync"
 )
 
 type FileEmailRepository struct {
-	emails      hashset.Set
+	emails      map[string]struct{}
 	storageFile string
+	mutex       *sync.RWMutex
 }
 
-func NewFileEmailRepository(storageFile string) (*FileEmailRepository, error) {
-	emails := *hashset.New()
+func NewFileEmailRepository(storageFile string, mutex *sync.RWMutex) (*FileEmailRepository, error) {
+	emails := map[string]struct{}{}
 
 	if fileExists(storageFile) {
 		data, err := os.ReadFile(storageFile)
@@ -21,23 +23,25 @@ func NewFileEmailRepository(storageFile string) (*FileEmailRepository, error) {
 			return nil, err
 		}
 
-		err = emails.FromJSON(data)
+		err = json.Unmarshal(data, &emails)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	r := FileEmailRepository{emails: emails, storageFile: storageFile}
-	return &r, nil
+	return &FileEmailRepository{emails: emails, storageFile: storageFile, mutex: mutex}, nil
 }
 
 func (r *FileEmailRepository) AddEmail(email string) error {
-	if r.emails.Contains(email) {
+	if r.emailExists(email) {
 		return &domain.DataConsistencyError{Message: fmt.Sprintf("Email address '%s' is already present in the database", email)}
 	}
 
-	r.emails.Add(email)
-	return nil
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	r.emails[email] = struct{}{}
+	return r.save()
 }
 
 func (r *FileEmailRepository) GetAll() []string {
@@ -45,18 +49,27 @@ func (r *FileEmailRepository) GetAll() []string {
 		return []string{}
 	}
 
-	values := r.emails.Values()
+	r.mutex.RLock()
+	defer r.mutex.RUnlock()
 
-	emailsArray := make([]string, len(values))
-	for i, value := range values {
-		emailsArray[i] = value.(string)
+	var emails []string
+	for email := range r.emails {
+		emails = append(emails, email)
 	}
 
-	return emailsArray
+	return emails
 }
 
-func (r *FileEmailRepository) Save() error {
-	data, err := r.emails.MarshalJSON()
+func (r *FileEmailRepository) emailExists(email string) bool {
+	r.mutex.RLock()
+	defer r.mutex.RUnlock()
+
+	_, exists := r.emails[email]
+	return exists
+}
+
+func (r *FileEmailRepository) save() error {
+	data, err := json.Marshal(r.emails)
 	if err != nil {
 		return err
 	}

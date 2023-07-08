@@ -5,7 +5,6 @@ import "btcRate/application"
 type IEmailRepository interface {
 	AddEmail(email string) error
 	GetAll() []string
-	Save() error
 }
 
 type IEmailClient interface {
@@ -29,11 +28,6 @@ func (c *CampaignService) Subscribe(email string) error {
 	}
 
 	err = c.emailRepository.AddEmail(email)
-	if err != nil {
-		return err
-	}
-
-	err = c.emailRepository.Save()
 	if err != nil {
 		return err
 	}

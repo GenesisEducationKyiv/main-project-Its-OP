@@ -7,13 +7,15 @@ import (
 	"btcRate/infrastructure/repositories"
 	"github.com/stretchr/testify/assert"
 	"os"
+	"sync"
 	"testing"
 )
 
 const storageFile = "artifacts/emails.json"
 
 func setup() *services.CampaignService {
-	emailRepo, _ := repositories.NewFileEmailRepository(storageFile)
+	mutex := &sync.RWMutex{}
+	emailRepo, _ := repositories.NewFileEmailRepository(storageFile, mutex)
 	emailValidator := &validators.EmailValidator{}
 	service := services.NewCampaignService(emailRepo, nil, emailValidator)
 
