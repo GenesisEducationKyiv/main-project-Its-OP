@@ -14,10 +14,6 @@ type IEmailClient interface {
 	Send(recipients []string, mailBody *domain.MailBody) error
 }
 
-type IValidator[T any] interface {
-	Validate(T) error
-}
-
 type IRateProvider interface {
 	GetRate(currency string, coin string) (domain.Rate, error)
 }
