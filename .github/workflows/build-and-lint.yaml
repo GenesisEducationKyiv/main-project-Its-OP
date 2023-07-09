@@ -17,4 +17,4 @@ jobs:
         microservice: [ 'campaign', 'coin' ]
     uses: ./.github/workflows/build-and-lint-template.yaml
     with:
-      microservice: ${{ matrix.version }}
+      microservice: ${{ matrix.microservice }}
