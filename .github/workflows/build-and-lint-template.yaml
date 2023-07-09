@@ -24,15 +24,15 @@ jobs:
 
       - name: Get dependencies
         run: go mod download
-        working-directory: ./src/${{ inputs.microservice }}
+        working-directory: ./src/${{ github.event.inputs.microservice }}
 
       - name: Build
         run: go build -v ./...
-        working-directory: ./src/${{ inputs.microservice }}
+        working-directory: ./src/${{ github.event.inputs.microservice }}
 
       - name: Run unit tests
         run: go test -v ./...
-        working-directory: ./src/${{ inputs.microservice }}
+        working-directory: ./src/${{ github.event.inputs.microservice }}
 
   golangci:
     name: lint
@@ -48,4 +48,4 @@ jobs:
         with:
           args: --timeout=10m
           version: v1.53
-          working-directory: ./src/${{ inputs.microservice }}
+          working-directory: ./src/${{ github.event.inputs.microservice }}
