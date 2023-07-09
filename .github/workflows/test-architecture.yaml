@@ -1,0 +1,31 @@
+name: test-architecture
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  run-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [ 'campaign', 'coin', 'common' ]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.19
+
+    - name: Install arch-go
+      run: go install -v github.com/fdaines/arch-go@latest
+      working-directory: ./src/${{ matrix.module }}
+
+    - name: Test Architecture
+      run: arch-go
+      working-directory: ./src/${{ matrix.module }}
