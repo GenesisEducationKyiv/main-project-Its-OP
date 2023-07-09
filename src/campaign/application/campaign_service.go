@@ -1,3 +1,4 @@
+//go:generate mockery --name IRateProvider
 package application
 
 import (

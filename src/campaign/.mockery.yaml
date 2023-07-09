@@ -1,3 +1,4 @@
-inpackage: true
+outpkg: "mocks"
 with-expecter: true
 testonly: true
+recursive: true
