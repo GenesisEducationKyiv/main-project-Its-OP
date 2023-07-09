@@ -10,7 +10,7 @@ import (
 func main() {
 	server := web.NewServerManager()
 
-	fc := &web.FileConfiguration{LogStorageFile: "./data/logs.csv", EmailStorageFile: "./data/emails.json"}
+	fc := &web.FileConfiguration{LogStorageFile: "./logs/campaign-logs.csv", EmailStorageFile: "./data/emails.json"}
 	sc := &web.SendgridConfiguration{ApiKey: os.Getenv("SENDGRID_KEY"), SenderName: os.Getenv("SENDGRID_SENDER_NAME"), SenderEmail: os.Getenv("SENDGRID_SENDER_EMAIL")}
 	pc := &web.ProviderConfiguration{Hostname: os.Getenv("COIN_HOST"), Schema: os.Getenv("COIN_SCHEMA")}
 

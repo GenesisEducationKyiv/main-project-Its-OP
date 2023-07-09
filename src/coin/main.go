@@ -9,7 +9,7 @@ import (
 
 func main() {
 	server := web.NewServerManager()
-	stop, err := server.RunServer("./data/logs.csv")
+	stop, err := server.RunServer("./logs/coin-logs.csv")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -10,6 +10,7 @@ services:
       dockerfile: coin/Dockerfile
     volumes:
       - coinData:/app/coin/data
+      - logs:/app/coin/logs
     ports:
       - "8080:8080"
 
@@ -20,6 +21,7 @@ services:
       dockerfile: campaign/Dockerfile
     volumes:
       - campaignData:/app/campaign/data
+      - logs:/app/campaign/logs
     ports:
       - "8081:8081"
     environment:
@@ -32,3 +34,4 @@ services:
 volumes:
   coinData:
   campaignData:
+  logs:
