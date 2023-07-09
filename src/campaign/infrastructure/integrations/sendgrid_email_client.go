@@ -37,7 +37,7 @@ func (s *SendGridEmailClient) Send(recipients []string, mailBody *domain.MailBod
 	response, err := s.client.Send(message)
 	if err != nil {
 		return err
-	} else if response.StatusCode != http.StatusOK {
+	} else if response.StatusCode < http.StatusOK || response.StatusCode > http.StatusNoContent {
 		err = fmt.Errorf("error sending an email. %d: %s", response.StatusCode, response.Body)
 		return err
 	}

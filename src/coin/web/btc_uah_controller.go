@@ -64,5 +64,5 @@ func (c *btcUahController) getRate(context *gin.Context) {
 		return
 	}
 
-	context.IndentedJSON(http.StatusOK, price.Amount)
+	context.IndentedJSON(http.StatusOK, price)
 }

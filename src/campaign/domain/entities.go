@@ -4,12 +4,12 @@ import "time"
 
 type Rate struct {
 	Amount    float64
-	Timestamp time.Time
 	Currency  string
+	Timestamp time.Time
 }
 
 type MailBody struct {
+	ReceiverAlias string
 	Subject       string
 	HtmlContent   string
-	ReceiverAlias string
 }
