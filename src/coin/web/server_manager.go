@@ -2,6 +2,7 @@ package web
 
 import (
 	"btcRate/coin/docs"
+	"btcRate/coin/domain"
 	"btcRate/common/infrastructure"
 	"btcRate/common/web"
 	"context"
@@ -56,7 +57,7 @@ func (*ServerManager) RunServer(logStorageFile string) (func() error, error) {
 	return stop, nil
 }
 
-func (s *ServerManager) GetRate(host string) (*web.Response[int], error) {
+func (s *ServerManager) GetRate(host string) (*web.Response[domain.Price], error) {
 	url := host + web.ApiBasePath + web.GetRate
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -70,15 +71,15 @@ func (s *ServerManager) GetRate(host string) (*web.Response[int], error) {
 	}
 
 	if isSuccessful(resp.Code) {
-		var result int
+		var result domain.Price
 		err = json.Unmarshal(resp.Body, &result)
 		if err != nil {
 			return nil, err
 		}
-		return &web.Response[int]{Code: resp.Code, Body: &result, ErrorMessage: "", Successful: true}, nil
+		return &web.Response[domain.Price]{Code: resp.Code, Body: &result, ErrorMessage: "", Successful: true}, nil
 	}
 
-	return &web.Response[int]{Code: resp.Code, ErrorMessage: string(resp.Body), Successful: false}, nil
+	return &web.Response[domain.Price]{Code: resp.Code, ErrorMessage: string(resp.Body), Successful: false}, nil
 }
 
 func isSuccessful(code int) bool {
