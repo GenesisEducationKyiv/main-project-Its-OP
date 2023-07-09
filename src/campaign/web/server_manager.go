@@ -27,11 +27,11 @@ func NewServerManager() ServerManager {
 	return ServerManager{infrastructure.NewHttpClient(nil)}
 }
 
-func (*ServerManager) RunServer(emailStorageFile string, logStorageFile string) (func() error, error) {
+func (*ServerManager) RunServer(fc *FileConfiguration, sc *SendgridConfiguration, pc *ProviderConfiguration) (func() error, error) {
 	r := gin.Default()
 	r.Use(web.ErrorHandlingMiddleware())
 
-	campaignController, err := newCampaignController(emailStorageFile, logStorageFile)
+	campaignController, err := newCampaignController(fc, sc, pc)
 	if err != nil {
 		return nil, err
 	}

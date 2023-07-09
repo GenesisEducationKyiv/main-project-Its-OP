@@ -15,7 +15,6 @@ import (
 	"github.com/sendgrid/sendgrid-go"
 	"net/http"
 	"net/url"
-	"os"
 	"sync"
 )
 
@@ -31,31 +30,31 @@ type campaignController struct {
 	coin            string
 }
 
-func newCampaignController(emailStorageFile string, logStorageFile string) (*campaignController, error) {
+func newCampaignController(fc *FileConfiguration, sc *SendgridConfiguration, pc *ProviderConfiguration) (*campaignController, error) {
 	supportedCurrency := "UAH"
 	supportedCoin := "BTC"
 
 	emailMutex := &sync.RWMutex{}
 
-	var emailRepository, err = repositories.NewFileEmailRepository(emailStorageFile, emailMutex)
+	var emailRepository, err = repositories.NewFileEmailRepository(fc.EmailStorageFile, emailMutex)
 	if err != nil {
 		return nil, err
 	}
 
-	logRepository, err := commonRepositories.NewFileLogRepository(logStorageFile)
+	logRepository, err := commonRepositories.NewFileLogRepository(fc.LogStorageFile)
 	if err != nil {
 		return nil, err
 	}
 
-	var sendgrid = sendgrid.NewSendClient(os.Getenv("SENDGRID_API_KEY"))
-	var emailClient = integrations.NewSendGridEmailClient(sendgrid, os.Getenv("SENDGRID_API_SENDER_NAME"), os.Getenv("SENDGRID_API_SENDER_EMAIL"))
+	var sendgrid = sendgrid.NewSendClient(sc.ApiKey)
+	var emailClient = integrations.NewSendGridEmailClient(sendgrid, sc.SenderName, sc.SenderEmail)
 
 	httpClient := infrastructure.NewHttpClient(nil)
 	loggedHttpClient := extensions.NewLoggedHttpClient(httpClient, logRepository)
 
 	var emailValidator = &validators.EmailValidator{}
 
-	var rateProvider = providers.NewRateProvider(loggedHttpClient, &url.URL{Scheme: "http", Host: "feature-coin:8080", Path: web.ApiBasePath})
+	var rateProvider = providers.NewRateProvider(loggedHttpClient, &url.URL{Scheme: pc.Schema, Host: pc.Hostname, Path: web.ApiBasePath})
 
 	var campaignService = application.NewCampaignService(emailRepository, emailClient, rateProvider, emailValidator)
 

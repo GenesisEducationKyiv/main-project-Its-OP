@@ -9,7 +9,12 @@ import (
 
 func main() {
 	server := web.NewServerManager()
-	stop, err := server.RunServer("./data/emails.json", "./data/logs.csv")
+
+	fc := &web.FileConfiguration{LogStorageFile: "./data/logs.csv", EmailStorageFile: "./data/emails.json"}
+	sc := &web.SendgridConfiguration{ApiKey: os.Getenv("SENDGRID_KEY"), SenderName: os.Getenv("SENDGRID_SENDER_NAME"), SenderEmail: os.Getenv("SENDGRID_SENDER_EMAIL")}
+	pc := &web.ProviderConfiguration{Hostname: os.Getenv("COIN_HOST"), Schema: os.Getenv("COIN_SCHEMA")}
+
+	stop, err := server.RunServer(fc, sc, pc)
 	if err != nil {
 		log.Fatal(err)
 	}
