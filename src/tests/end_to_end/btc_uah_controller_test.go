@@ -1,3 +1,5 @@
+//go:build endToEnd
+
 package end_to_end
 
 import (

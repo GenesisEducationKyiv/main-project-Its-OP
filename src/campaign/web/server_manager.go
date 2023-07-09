@@ -62,3 +62,31 @@ func (*ServerManager) RunServer(fc *FileConfiguration, sc *SendgridConfiguration
 
 	return stop, nil
 }
+
+func (s *ServerManager) SendEmails(host string) (*web.Response[string], error) {
+	url := host + web.ApiBasePath + web.SendEmails
+
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.SendRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if isSuccessful(resp.Code) {
+		result := string(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		return &web.Response[string]{Code: resp.Code, Body: &result, ErrorMessage: "", Successful: true}, nil
+	}
+
+	return &web.Response[string]{Code: resp.Code, ErrorMessage: string(resp.Body), Successful: false}, nil
+}
+
+func isSuccessful(code int) bool {
+	return code >= http.StatusOK && code < http.StatusBadRequest
+}
