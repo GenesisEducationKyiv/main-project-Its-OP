@@ -23,7 +23,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Get dependencies
-        run: go mod download
+        run: |
+          'echo ./src/${{ github.event.inputs.microservice }}'
+          'echo ./src/${{ inputs.microservice }}'
         working-directory: ./src/${{ github.event.inputs.microservice }}
 
       - name: Build
