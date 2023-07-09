@@ -29,7 +29,7 @@ func (c *LoggedHttpClient) SendRequest(req *http.Request) (*infrastructure.HttpR
 	var logMessage string
 
 	if err != nil {
-		logMessage = fmt.Sprintf("%s,%s,'%s'", timestamp.Format("02-01-06 15:04:05.999 Z0700"), url, err.Error())
+		logMessage = fmt.Sprintf("%s,%s,error: '%s'", timestamp.Format("02-01-06 15:04:05.999 Z0700"), url, err.Error())
 	} else {
 		logMessage = fmt.Sprintf("%s,%s,%d,'%s'", timestamp.Format("02-01-06 15:04:05.999 Z0700"), url, resp.Code, string(resp.Body))
 	}
