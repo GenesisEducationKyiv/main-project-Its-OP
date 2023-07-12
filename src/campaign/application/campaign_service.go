@@ -25,10 +25,11 @@ type CampaignService struct {
 	emailClient     IEmailClient
 	rateProvider    IRateProvider
 	emailValidator  application.IValidator[string]
+	logger          application.ILogger
 }
 
-func NewCampaignService(r IEmailRepository, c IEmailClient, rP IRateProvider, emailV application.IValidator[string]) *CampaignService {
-	return &CampaignService{emailRepository: r, emailClient: c, rateProvider: rP, emailValidator: emailV}
+func NewCampaignService(r IEmailRepository, c IEmailClient, rP IRateProvider, emailV application.IValidator[string], l application.ILogger) *CampaignService {
+	return &CampaignService{emailRepository: r, emailClient: c, rateProvider: rP, emailValidator: emailV, logger: l}
 }
 
 func (c *CampaignService) Subscribe(email string) error {
@@ -36,6 +37,8 @@ func (c *CampaignService) Subscribe(email string) error {
 	if err != nil {
 		return err
 	}
+
+	_ = c.logger.LogInformation(fmt.Sprintf("email address %s was added to the campaign list", email))
 
 	return nil
 }
@@ -65,6 +68,8 @@ func (c *CampaignService) sendEmails(mailBody *domain.MailBody) error {
 	if err != nil {
 		return err
 	}
+
+	_ = c.logger.LogInformation(fmt.Sprintf("campaign emails have been sent to %d receivers", len(emails)))
 
 	return nil
 }
