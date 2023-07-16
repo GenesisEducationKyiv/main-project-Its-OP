@@ -30,7 +30,7 @@ func main() {
 
 func addCommandBus() *cqrs.CommandBus {
 	cqrsMarshaler := cqrs.ProtobufMarshaler{}
-	commandsAMQPConfig := amqp.NewDurableQueueConfig("amqp://localhost:5672")
+	commandsAMQPConfig := amqp.NewDurableQueueConfig("amqp://guest:guest@rabbitmq:5672/")
 
 	commandsPublisher, err := amqp.NewPublisher(commandsAMQPConfig, nil)
 	if err != nil {
