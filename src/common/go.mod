@@ -2,7 +2,11 @@ module btcRate/common
 
 go 1.20
 
-require github.com/gin-gonic/gin v1.9.1
+require (
+	github.com/gin-gonic/gin v1.9.1
+	github.com/google/uuid v1.3.0
+	github.com/streadway/amqp v1.1.0
+)
 
 require (
 	github.com/bytedance/sonic v1.9.1 // indirect
