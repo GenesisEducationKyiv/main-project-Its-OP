@@ -6,6 +6,7 @@ import (
 	"btcRate/common/infrastructure"
 	"btcRate/common/web"
 	"context"
+	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
 	swaggerfiles "github.com/swaggo/files"
@@ -15,18 +16,19 @@ import (
 )
 
 type ServerManager struct {
-	client infrastructure.IHttpClient
+	client     infrastructure.IHttpClient
+	commandBus *cqrs.CommandBus
 }
 
-func NewServerManager() ServerManager {
-	return ServerManager{infrastructure.NewHttpClient(nil)}
+func NewServerManager(commandBus *cqrs.CommandBus) ServerManager {
+	return ServerManager{infrastructure.NewHttpClient(nil), commandBus}
 }
 
-func (*ServerManager) RunServer(logStorageFile string) (func() error, error) {
+func (s *ServerManager) RunServer(logStorageFile string) (func() error, error) {
 	r := gin.Default()
 	r.Use(web.ErrorHandlingMiddleware())
 
-	btcUahController, err := newBtcUahController(logStorageFile)
+	btcUahController, err := newBtcUahController(logStorageFile, s.commandBus)
 	if err != nil {
 		return nil, err
 	}

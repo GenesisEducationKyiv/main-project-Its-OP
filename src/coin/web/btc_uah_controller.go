@@ -6,7 +6,8 @@ import (
 	"btcRate/coin/application/validators"
 	"btcRate/coin/domain"
 	"btcRate/coin/infrastructure/factories"
-	"btcRate/common/infrastructure/repositories"
+	"btcRate/common/infrastructure"
+	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -23,18 +24,15 @@ type btcUahController struct {
 	coin        string
 }
 
-func newBtcUahController(logStorageFile string) (*btcUahController, error) {
+func newBtcUahController(logStorageFile string, commandBus *cqrs.CommandBus) (*btcUahController, error) {
 	supportedCurrency := "UAH"
 	supportedCoin := "BTC"
 
-	logRepository, err := repositories.NewFileLogRepository(logStorageFile)
-	if err != nil {
-		return nil, err
-	}
+	logger := infrastructure.NewLogger(commandBus)
 
-	binanceFactory := factories.NewBinanceClientFactory(logRepository)
-	coinbaseFactory := factories.NewCoinbaseClientFactory(logRepository)
-	bitfinexFactory := factories.NewBitfinexClientFactory(logRepository)
+	binanceFactory := factories.NewBinanceClientFactory(logger)
+	coinbaseFactory := factories.NewCoinbaseClientFactory(logger)
+	bitfinexFactory := factories.NewBitfinexClientFactory(logger)
 	coinClientFactories := []application.ICoinClientFactory{binanceFactory, coinbaseFactory, bitfinexFactory}
 
 	chainedCoinClientFactory := proxies.NewChainedCoinClientFactory(coinClientFactories)
@@ -42,7 +40,7 @@ func newBtcUahController(logStorageFile string) (*btcUahController, error) {
 	var supportedCoinValidator = validators.NewSupportedCoinValidator([]string{supportedCoin})
 	var supportedCurrencyValidator = validators.NewSupportedCurrencyValidator([]string{supportedCurrency})
 
-	var btcUahService = application.NewCoinService(chainedCoinClientFactory, supportedCoinValidator, supportedCurrencyValidator)
+	var btcUahService = application.NewCoinService(chainedCoinClientFactory, supportedCoinValidator, supportedCurrencyValidator, logger)
 
 	controller := &btcUahController{coinService: btcUahService, currency: supportedCurrency, coin: supportedCoin}
 

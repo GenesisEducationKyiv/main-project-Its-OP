@@ -14,7 +14,7 @@ import (
 
 func main() {
 	commandBus := addCommandBus()
-	server := web.NewServerManager()
+	server := web.NewServerManager(commandBus)
 	stop, err := server.RunServer("./logs/coin-logs.csv")
 	if err != nil {
 		log.Fatal(err)
