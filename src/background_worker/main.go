@@ -1,7 +1,7 @@
 package main
 
 import (
-	"btcRate/coin/web"
+	"background_worker/application/command_handlers"
 	"context"
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
@@ -14,30 +14,21 @@ import (
 )
 
 func main() {
-	commandBus, router := addCommandBus()
+	router := addCommandBus()
 	go func() {
 		_ = router.Run(context.Background())
 	}()
 
-	server := web.NewServerManager(commandBus)
-	stop, err := server.RunServer("./logs/coin-logs.csv")
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	<-c
-	if err := stop(); err != nil {
-		log.Fatal("Failed to stop the server: ", err)
-	}
 
 	if err := router.Close(); err != nil {
 		log.Fatal("Failed to stop the Router: ", err)
 	}
 }
 
-func addCommandBus() (*cqrs.CommandBus, *message.Router) {
+func addCommandBus() *message.Router {
 	cqrsMarshaler := cqrs.ProtobufMarshaler{}
 	logger := watermill.NewStdLoggerWithOut(os.Stdout, false, false)
 	commandsAMQPConfig := amqp.NewDurableQueueConfig("amqp://admin:admin@localhost:5672/")
@@ -76,7 +67,7 @@ func addCommandBus() (*cqrs.CommandBus, *message.Router) {
 		panic(err)
 	}
 
-	commandBus, err := cqrs.NewCommandBusWithConfig(
+	_, err = cqrs.NewCommandBusWithConfig(
 		commandsPublisher,
 		cqrs.CommandBusConfig{
 			GeneratePublishTopic: func(params cqrs.CommandBusGeneratePublishTopicParams) (string, error) {
@@ -88,5 +79,28 @@ func addCommandBus() (*cqrs.CommandBus, *message.Router) {
 		panic(err)
 	}
 
-	return commandBus, router
+	commandProcessor, err := cqrs.NewCommandProcessorWithConfig(
+		router,
+		cqrs.CommandProcessorConfig{
+			GenerateSubscribeTopic: func(params cqrs.CommandProcessorGenerateSubscribeTopicParams) (string, error) {
+				return params.CommandName, nil
+			},
+			SubscriberConstructor: func(params cqrs.CommandProcessorSubscriberConstructorParams) (message.Subscriber, error) {
+				return commandsSubscriber, nil
+			},
+			Marshaler: cqrsMarshaler,
+		},
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	err = commandProcessor.AddHandlers(
+		command_handlers.LogCommandHandler{},
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	return router
 }

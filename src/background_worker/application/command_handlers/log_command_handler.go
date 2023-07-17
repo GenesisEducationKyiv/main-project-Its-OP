@@ -14,7 +14,7 @@ func (h LogCommandHandler) HandlerName() string {
 }
 
 func (h LogCommandHandler) NewCommand() interface{} {
-	return &commands.LogCommand{}
+	return commands.LogCommand{}
 }
 
 func (h LogCommandHandler) Handle(ctx context.Context, cmd interface{}) error {
