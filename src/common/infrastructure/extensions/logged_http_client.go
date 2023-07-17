@@ -39,7 +39,7 @@ func (c *LoggedHttpClient) SendRequest(req *http.Request) (*infrastructure.HttpR
 	}
 
 	if logErr != nil {
-		fmt.Printf(err.Error())
+		fmt.Printf(logErr.Error())
 	}
 
 	return resp, err

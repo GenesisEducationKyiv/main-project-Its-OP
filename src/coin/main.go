@@ -4,6 +4,7 @@ import (
 	"btcRate/coin/web"
 	"btcRate/common/infrastructure/bus/command_handlers"
 	"context"
+	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/ThreeDotsLabs/watermill/message"
@@ -13,7 +14,11 @@ import (
 )
 
 func main() {
-	commandBus := addCommandBus()
+	commandBus, router := addCommandBus()
+	go func() {
+		_ = router.Run(context.Background())
+	}()
+
 	server := web.NewServerManager(commandBus)
 	stop, err := server.RunServer("./logs/coin-logs.csv")
 	if err != nil {
@@ -26,23 +31,28 @@ func main() {
 	if err := stop(); err != nil {
 		log.Fatal("Failed to stop the server: ", err)
 	}
+
+	if err := router.Close(); err != nil {
+		log.Fatal("Failed to stop the Router: ", err)
+	}
 }
 
-func addCommandBus() *cqrs.CommandBus {
+func addCommandBus() (*cqrs.CommandBus, *message.Router) {
+	logger := watermill.NewStdLoggerWithOut(os.Stdout, true, true)
 	cqrsMarshaler := cqrs.ProtobufMarshaler{}
-	commandsAMQPConfig := amqp.NewDurableQueueConfig("amqp://guest:guest@rabbitmq:5672/")
+	commandsAMQPConfig := amqp.NewDurableQueueConfig("amqp://admin:admin@localhost:5672/")
 
-	commandsPublisher, err := amqp.NewPublisher(commandsAMQPConfig, nil)
+	commandsPublisher, err := amqp.NewPublisher(commandsAMQPConfig, logger)
 	if err != nil {
 		panic(err)
 	}
 
-	commandsSubscriber, err := amqp.NewSubscriber(commandsAMQPConfig, nil)
+	commandsSubscriber, err := amqp.NewSubscriber(commandsAMQPConfig, logger)
 	if err != nil {
 		panic(err)
 	}
 
-	router, err := message.NewRouter(message.RouterConfig{}, nil)
+	router, err := message.NewRouter(message.RouterConfig{}, logger)
 	if err != nil {
 		panic(err)
 	}
@@ -82,10 +92,5 @@ func addCommandBus() *cqrs.CommandBus {
 		panic(err)
 	}
 
-	// processors are based on router, so they will work when router will start
-	if err := router.Run(context.Background()); err != nil {
-		panic(err)
-	}
-
-	return commandBus
+	return commandBus, router
 }

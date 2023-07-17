@@ -1,14 +1,15 @@
 package commands
 
-import (
-	"github.com/google/uuid"
-)
-
 type LogCommand struct {
-	ID  uuid.UUID
-	Log string
+	Log string `protobuf:"bytes,1,opt,name=Log"`
 }
 
-func NewLogCommand(id uuid.UUID, body string) *LogCommand {
-	return &LogCommand{ID: id, Log: body}
+func (c *LogCommand) Reset() {
+	c.Log = ""
 }
+
+func (c *LogCommand) String() string {
+	return c.Log
+}
+
+func (c *LogCommand) ProtoMessage() {}
