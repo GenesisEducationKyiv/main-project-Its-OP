@@ -44,7 +44,7 @@ func main() {
 func addCommandBus(messageBusHost string) (*cqrs.CommandBus, *message.Router) {
 	cqrsMarshaler := cqrs.JSONMarshaler{}
 	logger := watermill.NewStdLoggerWithOut(os.Stdout, false, false)
-	commandsAMQPConfig := amqp.NewDurableQueueConfig(fmt.Sprintf("amqp://admin:admin@%s:5672/", messageBusHost))
+	commandsAMQPConfig := amqp.NewDurableQueueConfig(fmt.Sprintf("amqp://admin:admin@%s/", messageBusHost))
 
 	var commandsPublisher *amqp.Publisher
 	var commandsSubscriber *amqp.Subscriber

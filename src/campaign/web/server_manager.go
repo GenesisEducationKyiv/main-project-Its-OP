@@ -5,6 +5,7 @@ import (
 	"btcRate/common/infrastructure"
 	"btcRate/common/web"
 	"context"
+	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -27,11 +28,11 @@ func NewServerManager() ServerManager {
 	return ServerManager{infrastructure.NewHttpClient(nil)}
 }
 
-func (*ServerManager) RunServer(fc *FileConfiguration, sc *SendgridConfiguration, pc *ProviderConfiguration) (func() error, error) {
+func (*ServerManager) RunServer(fc *FileConfiguration, sc *SendgridConfiguration, pc *ProviderConfiguration, commandBus *cqrs.CommandBus) (func() error, error) {
 	r := gin.Default()
 	r.Use(web.ErrorHandlingMiddleware())
 
-	campaignController, err := newCampaignController(fc, sc, pc)
+	campaignController, err := newCampaignController(fc, sc, pc, commandBus)
 	if err != nil {
 		return nil, err
 	}

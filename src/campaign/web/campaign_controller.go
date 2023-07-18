@@ -9,8 +9,8 @@ import (
 	"btcRate/campaign/infrastructure/repositories"
 	"btcRate/common/infrastructure"
 	"btcRate/common/infrastructure/extensions"
-	commonRepositories "btcRate/common/infrastructure/repositories"
 	"btcRate/common/web"
+	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
 	"net/http"
@@ -30,7 +30,11 @@ type campaignController struct {
 	coin            string
 }
 
-func newCampaignController(fc *FileConfiguration, sc *SendgridConfiguration, pc *ProviderConfiguration) (*campaignController, error) {
+func newCampaignController(
+	fc *FileConfiguration,
+	sc *SendgridConfiguration,
+	pc *ProviderConfiguration,
+	commandBus *cqrs.CommandBus) (*campaignController, error) {
 	supportedCurrency := "UAH"
 	supportedCoin := "BTC"
 
@@ -41,22 +45,18 @@ func newCampaignController(fc *FileConfiguration, sc *SendgridConfiguration, pc 
 		return nil, err
 	}
 
-	logRepository, err := commonRepositories.NewFileLogRepository(fc.LogStorageFile)
-	if err != nil {
-		return nil, err
-	}
-
 	var sendgrid = sendgrid.NewSendClient(sc.ApiKey)
 	var emailClient = integrations.NewSendGridEmailClient(sendgrid, sc.SenderName, sc.SenderEmail)
+	logger := infrastructure.NewLogger(commandBus)
 
 	httpClient := infrastructure.NewHttpClient(nil)
-	loggedHttpClient := extensions.NewLoggedHttpClient(httpClient, logRepository)
+	loggedHttpClient := extensions.NewLoggedHttpClient(httpClient, logger)
 
 	var emailValidator = &validators.EmailValidator{}
 
 	var rateProvider = providers.NewRateProvider(loggedHttpClient, &url.URL{Scheme: pc.Schema, Host: pc.Hostname, Path: web.ApiBasePath})
 
-	var campaignService = application.NewCampaignService(emailRepository, emailClient, rateProvider, emailValidator)
+	var campaignService = application.NewCampaignService(emailRepository, emailClient, rateProvider, emailValidator, logger)
 
 	controller := &campaignController{campaignService: campaignService, currency: supportedCurrency, coin: supportedCoin}
 

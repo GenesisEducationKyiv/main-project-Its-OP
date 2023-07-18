@@ -16,26 +16,27 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - MESSAGEBUS_HOST=rabbitmq
+      - MESSAGEBUS_HOST=rabbitmq:5672
 
-#  feature-campaign:
-#    container_name: feature-campaign
-#    depends_on:
-#      - kafka
-#    build:
-#      context: src/.
-#      dockerfile: campaign/Dockerfile
-#    volumes:
-#      - campaignData:/app/campaign/data
-#      - logs:/app/campaign/logs
-#    ports:
-#      - "8081:8081"
-#    environment:
-#      - COIN_HOST=feature-coin:8080
-#      - COIN_SCHEMA=http
-#      - SENDGRID_KEY=your_key
-#      - SENDGRID_SENDER_EMAIL=your_email
-#      - SENDGRID_SENDER_NAME=your_name
+  feature-campaign:
+    container_name: feature-campaign
+    depends_on:
+      - kafka
+    build:
+      context: src/.
+      dockerfile: campaign/Dockerfile
+    volumes:
+      - campaignData:/app/campaign/data
+      - logs:/app/campaign/logs
+    ports:
+      - "8081:8081"
+    environment:
+      - COIN_HOST=feature-coin:8080
+      - COIN_SCHEMA=http
+      - SENDGRID_KEY=your_key
+      - SENDGRID_SENDER_EMAIL=your_email
+      - SENDGRID_SENDER_NAME=your_name
+      - KAFKA_HOST=kafka:9092
 
   rabbitmq:
     container_name: rabbitmq
