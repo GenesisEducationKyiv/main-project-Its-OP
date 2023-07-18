@@ -20,7 +20,9 @@ import (
 func main() {
 	commandBus, router := addCommandBus(os.Getenv("KAFKA_HOST"))
 	go func() {
-		_ = router.Run(context.Background())
+		if err := router.Run(context.Background()); err != nil {
+			log.Printf("Error running router: %v", err)
+		}
 	}()
 
 	server := web.NewServerManager()
@@ -47,31 +49,9 @@ func addCommandBus(messageBusHost string) (*cqrs.CommandBus, *message.Router) {
 	logger := watermill.NewStdLoggerWithOut(os.Stdout, false, false)
 	commandsKafkaConfig := kafka.DefaultSaramaSyncPublisherConfig()
 
-	commandsKafkaConfig.Producer.Return.Successes = true
-	commandsKafkaConfig.Net.SASL.Enable = true // add additional Kafka configuration as needed
-
 	var commandsPublisher *kafka.Publisher
 	var commandsSubscriber *kafka.Subscriber
 	var err error
-
-	commandsPublisher, err = kafka.NewPublisher(
-		kafka.PublisherConfig{
-			Brokers:   []string{messageBusHost},
-			Marshaler: kafka.DefaultMarshaler{},
-		},
-		logger,
-	)
-	if err == nil {
-		commandsSubscriber, err = kafka.NewSubscriber(
-			kafka.SubscriberConfig{
-				Brokers:               []string{messageBusHost},
-				Unmarshaler:           kafka.DefaultMarshaler{},
-				OverwriteSaramaConfig: commandsKafkaConfig,
-				ConsumerGroup:         "campaign-consumer-group", // replace with your Kafka consumer group
-			},
-			logger,
-		)
-	}
 
 	for i := 0; i < 10; i++ {
 		var err error
@@ -150,7 +130,7 @@ func addCommandBus(messageBusHost string) (*cqrs.CommandBus, *message.Router) {
 	}
 
 	err = commandProcessor.AddHandlers(
-		command_handlers.LogCommandHandler{},
+		command_handlers.ErrorCommandHandler{},
 	)
 	if err != nil {
 		panic(err)

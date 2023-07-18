@@ -69,7 +69,7 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
       - ALLOW_PLAINTEXT_LISTENER=yes
     volumes:
-      - '/var/run/docker.sock:/var/run/docker.sock'
+      - 'kafka:/bitnami/kafka/data'
     depends_on:
       - zookeeper
 
@@ -78,3 +78,4 @@ volumes:
   campaignData:
   logs:
   rabbitmq:
+  kafka:

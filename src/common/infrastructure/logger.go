@@ -27,7 +27,7 @@ func (l *Logger) LogInformation(message string) error {
 }
 
 func (l *Logger) LogDebug(message string) error {
-	logCommand := commands.NewLogCommand(fmt.Sprintf("DEBUG - %s", message), LogLevelError)
+	logCommand := commands.NewLogCommand(fmt.Sprintf("DEBUG - %s", message), LogLevelDebug)
 	return l.commandBus.Send(context.Background(), logCommand)
 }
 
