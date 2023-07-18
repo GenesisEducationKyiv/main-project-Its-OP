@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	Info  = "INFO"
-	Debug = "DEBUG"
-	Error = "ERROR"
+	LogLevelInfo  = "Info"
+	LogLevelDebug = "Debug"
+	LogLevelError = "Error"
 )
 
 type Logger struct {
@@ -22,16 +22,16 @@ func NewLogger(commandBus *cqrs.CommandBus) *Logger {
 }
 
 func (l *Logger) LogInformation(message string) error {
-	logCommand := commands.NewLogCommand(fmt.Sprintf("INFO - %s", message), Info)
+	logCommand := commands.NewLogCommand(fmt.Sprintf("INFO - %s", message), LogLevelInfo)
 	return l.commandBus.Send(context.Background(), logCommand)
 }
 
 func (l *Logger) LogDebug(message string) error {
-	logCommand := commands.NewLogCommand(fmt.Sprintf("DEBUG - %s", message), Debug)
+	logCommand := commands.NewLogCommand(fmt.Sprintf("DEBUG - %s", message), LogLevelError)
 	return l.commandBus.Send(context.Background(), logCommand)
 }
 
 func (l *Logger) LogError(err error, message string) error {
-	logCommand := commands.NewLogCommand(fmt.Sprintf("ERROR - %s; {errMsg: %s}", message, err.Error()), Error)
+	logCommand := commands.NewLogCommand(fmt.Sprintf("ERROR - %s; {errMsg: %s}", message, err.Error()), LogLevelError)
 	return l.commandBus.Send(context.Background(), logCommand)
 }

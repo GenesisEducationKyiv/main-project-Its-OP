@@ -19,7 +19,7 @@ func (h LogCommandHandler) NewCommand() interface{} {
 
 func (h LogCommandHandler) Handle(_ context.Context, cmd interface{}) error {
 	logCommand := cmd.(*commands.LogCommand)
-	fmt.Print(logCommand.LogData)
+	fmt.Printf("%s\n", logCommand.LogData)
 
 	return nil
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"btcRate/coin/web"
+	"btcRate/common/infrastructure"
 	"btcRate/common/infrastructure/bus/command_handlers"
 	"btcRate/common/infrastructure/bus/commands"
 	"context"
@@ -17,7 +18,7 @@ import (
 )
 
 func main() {
-	commandBus, router := addCommandBus()
+	commandBus, router := addCommandBus(os.Getenv("MESSAGEBUS_HOST"))
 	go func() {
 		_ = router.Run(context.Background())
 	}()
@@ -40,10 +41,10 @@ func main() {
 	}
 }
 
-func addCommandBus() (*cqrs.CommandBus, *message.Router) {
+func addCommandBus(messageBusHost string) (*cqrs.CommandBus, *message.Router) {
 	cqrsMarshaler := cqrs.JSONMarshaler{}
 	logger := watermill.NewStdLoggerWithOut(os.Stdout, false, false)
-	commandsAMQPConfig := amqp.NewDurableQueueConfig("amqp://admin:admin@rabbitmq:5672/")
+	commandsAMQPConfig := amqp.NewDurableQueueConfig(fmt.Sprintf("amqp://admin:admin@%s:5672/", messageBusHost))
 
 	var commandsPublisher *amqp.Publisher
 	var commandsSubscriber *amqp.Subscriber
@@ -103,7 +104,7 @@ func addCommandBus() (*cqrs.CommandBus, *message.Router) {
 				case command_handlers.LogCommandHandler:
 					return fmt.Sprintf("%s.*", params.CommandName), nil
 				case command_handlers.ErrorCommandHandler:
-					return fmt.Sprintf("%s.LogCommand.Error", params.CommandName), nil
+					return fmt.Sprintf("%s.%s", params.CommandName, infrastructure.LogLevelError), nil
 				default:
 					return params.CommandName, nil
 				}
@@ -119,7 +120,7 @@ func addCommandBus() (*cqrs.CommandBus, *message.Router) {
 	}
 
 	err = commandProcessor.AddHandlers(
-		command_handlers.ErrorCommandHandler{},
+		command_handlers.LogCommandHandler{},
 	)
 	if err != nil {
 		panic(err)

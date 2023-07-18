@@ -20,7 +20,7 @@ func (h ErrorCommandHandler) NewCommand() interface{} {
 
 func (h ErrorCommandHandler) Handle(_ context.Context, cmd interface{}) error {
 	logCommand := cmd.(*commands.LogCommand)
-	_, err := fmt.Fprint(os.Stderr, logCommand.LogData)
+	_, err := fmt.Fprint(os.Stderr, fmt.Sprintf("%s\n", logCommand.LogData))
 
 	return err
 }
