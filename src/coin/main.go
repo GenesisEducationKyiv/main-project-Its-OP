@@ -3,7 +3,9 @@ package main
 import (
 	"btcRate/coin/web"
 	"btcRate/common/infrastructure/bus/command_handlers"
+	"btcRate/common/infrastructure/bus/commands"
 	"context"
+	"fmt"
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
@@ -81,6 +83,10 @@ func addCommandBus() (*cqrs.CommandBus, *message.Router) {
 		commandsPublisher,
 		cqrs.CommandBusConfig{
 			GeneratePublishTopic: func(params cqrs.CommandBusGeneratePublishTopicParams) (string, error) {
+				// Custom routing for LogCommands
+				if logCommand, ok := params.Command.(*commands.LogCommand); ok {
+					return fmt.Sprintf("%s.%s", params.CommandName, logCommand.LogLevel), nil
+				}
 				return params.CommandName, nil
 			},
 			Marshaler: cqrsMarshaler,
@@ -93,7 +99,14 @@ func addCommandBus() (*cqrs.CommandBus, *message.Router) {
 		router,
 		cqrs.CommandProcessorConfig{
 			GenerateSubscribeTopic: func(params cqrs.CommandProcessorGenerateSubscribeTopicParams) (string, error) {
-				return params.CommandName, nil
+				switch params.CommandHandler.(type) {
+				case command_handlers.LogCommandHandler:
+					return fmt.Sprintf("%s.*", params.CommandName), nil
+				case command_handlers.ErrorCommandHandler:
+					return fmt.Sprintf("%s.LogCommand.Error", params.CommandName), nil
+				default:
+					return params.CommandName, nil
+				}
 			},
 			SubscriberConstructor: func(params cqrs.CommandProcessorSubscriberConstructorParams) (message.Subscriber, error) {
 				return commandsSubscriber, nil
@@ -106,7 +119,7 @@ func addCommandBus() (*cqrs.CommandBus, *message.Router) {
 	}
 
 	err = commandProcessor.AddHandlers(
-		command_handlers.LogCommandHandler{},
+		command_handlers.ErrorCommandHandler{},
 	)
 	if err != nil {
 		panic(err)
