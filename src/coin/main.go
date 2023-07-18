@@ -43,8 +43,16 @@ func main() {
 
 func addCommandBus(messageBusHost string) (*cqrs.CommandBus, *message.Router) {
 	cqrsMarshaler := cqrs.JSONMarshaler{}
-	logger := watermill.NewStdLoggerWithOut(os.Stdout, false, false)
+	logger := watermill.NewStdLoggerWithOut(os.Stdout, true, true)
+
 	commandsAMQPConfig := amqp.NewDurableQueueConfig(fmt.Sprintf("amqp://admin:admin@%s/", messageBusHost))
+	commandsAMQPConfig.Exchange.GenerateName = func(topic string) string {
+		return "custom_topic"
+	}
+	commandsAMQPConfig.Exchange.Type = "topic"
+	commandsAMQPConfig.QueueBind.GenerateRoutingKey = func(topic string) string {
+		return topic
+	}
 
 	var commandsPublisher *amqp.Publisher
 	var commandsSubscriber *amqp.Subscriber
