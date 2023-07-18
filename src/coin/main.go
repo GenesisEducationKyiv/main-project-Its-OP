@@ -2,6 +2,7 @@ package main
 
 import (
 	"btcRate/coin/web"
+	"btcRate/common/infrastructure/bus/command_handlers"
 	"context"
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
@@ -40,7 +41,7 @@ func main() {
 func addCommandBus() (*cqrs.CommandBus, *message.Router) {
 	cqrsMarshaler := cqrs.ProtobufMarshaler{}
 	logger := watermill.NewStdLoggerWithOut(os.Stdout, false, false)
-	commandsAMQPConfig := amqp.NewDurableQueueConfig("amqp://admin:admin@localhost:5672/")
+	commandsAMQPConfig := amqp.NewDurableQueueConfig("amqp://admin:admin@rabbitmq:5672/")
 
 	var commandsPublisher *amqp.Publisher
 	var commandsSubscriber *amqp.Subscriber
@@ -84,6 +85,29 @@ func addCommandBus() (*cqrs.CommandBus, *message.Router) {
 			},
 			Marshaler: cqrsMarshaler,
 		})
+	if err != nil {
+		panic(err)
+	}
+
+	commandProcessor, err := cqrs.NewCommandProcessorWithConfig(
+		router,
+		cqrs.CommandProcessorConfig{
+			GenerateSubscribeTopic: func(params cqrs.CommandProcessorGenerateSubscribeTopicParams) (string, error) {
+				return params.CommandName, nil
+			},
+			SubscriberConstructor: func(params cqrs.CommandProcessorSubscriberConstructorParams) (message.Subscriber, error) {
+				return commandsSubscriber, nil
+			},
+			Marshaler: cqrsMarshaler,
+		},
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	err = commandProcessor.AddHandlers(
+		command_handlers.LogCommandHandler{},
+	)
 	if err != nil {
 		panic(err)
 	}

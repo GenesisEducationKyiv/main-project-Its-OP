@@ -14,10 +14,10 @@ func (h LogCommandHandler) HandlerName() string {
 }
 
 func (h LogCommandHandler) NewCommand() interface{} {
-	return commands.LogCommand{}
+	return &commands.LogCommand{}
 }
 
-func (h LogCommandHandler) Handle(ctx context.Context, cmd interface{}) error {
+func (h LogCommandHandler) Handle(_ context.Context, cmd interface{}) error {
 	logCommand := cmd.(*commands.LogCommand)
 	fmt.Print(logCommand.Log)
 
