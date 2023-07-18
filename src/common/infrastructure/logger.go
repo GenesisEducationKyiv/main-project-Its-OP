@@ -7,6 +7,12 @@ import (
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 )
 
+const (
+	Info  = "INFO"
+	Debug = "DEBUG"
+	Error = "ERROR"
+)
+
 type Logger struct {
 	commandBus *cqrs.CommandBus
 }
@@ -16,16 +22,16 @@ func NewLogger(commandBus *cqrs.CommandBus) *Logger {
 }
 
 func (l *Logger) LogInformation(message string) error {
-	logCommand := &commands.LogCommand{Log: fmt.Sprintf("INFO - %s", message)}
+	logCommand := commands.NewLogCommand(fmt.Sprintf("INFO - %s", message), Info)
 	return l.commandBus.Send(context.Background(), logCommand)
 }
 
 func (l *Logger) LogDebug(message string) error {
-	logCommand := &commands.LogCommand{Log: fmt.Sprintf("DEBUG - %s", message)}
+	logCommand := commands.NewLogCommand(fmt.Sprintf("DEBUG - %s", message), Debug)
 	return l.commandBus.Send(context.Background(), logCommand)
 }
 
 func (l *Logger) LogError(err error, message string) error {
-	logCommand := &commands.LogCommand{Log: fmt.Sprintf("ERROR - %s; {errMsg: %s}", message, err.Error())}
+	logCommand := commands.NewLogCommand(fmt.Sprintf("ERROR - %s; {errMsg: %s}", message, err.Error()), Error)
 	return l.commandBus.Send(context.Background(), logCommand)
 }

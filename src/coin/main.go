@@ -39,7 +39,7 @@ func main() {
 }
 
 func addCommandBus() (*cqrs.CommandBus, *message.Router) {
-	cqrsMarshaler := cqrs.ProtobufMarshaler{}
+	cqrsMarshaler := cqrs.JSONMarshaler{}
 	logger := watermill.NewStdLoggerWithOut(os.Stdout, false, false)
 	commandsAMQPConfig := amqp.NewDurableQueueConfig("amqp://admin:admin@rabbitmq:5672/")
 

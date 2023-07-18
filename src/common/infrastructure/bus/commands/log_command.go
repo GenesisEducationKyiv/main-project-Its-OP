@@ -1,15 +1,20 @@
 package commands
 
 type LogCommand struct {
-	Log string `protobuf:"bytes,1,opt,name=Log"`
+	LogData  string
+	LogLevel string
+}
+
+func NewLogCommand(data string, level string) *LogCommand {
+	return &LogCommand{LogData: data, LogLevel: level}
 }
 
 func (c *LogCommand) Reset() {
-	c.Log = ""
+	c.LogData = ""
 }
 
 func (c *LogCommand) String() string {
-	return c.Log
+	return c.LogData
 }
 
 func (c *LogCommand) ProtoMessage() {}
