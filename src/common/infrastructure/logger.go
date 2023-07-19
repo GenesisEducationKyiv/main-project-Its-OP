@@ -1,10 +1,10 @@
 package infrastructure
 
 import (
+	"btcRate/common/application"
 	"btcRate/common/infrastructure/bus/commands"
 	"context"
 	"fmt"
-	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 )
 
 const (
@@ -14,10 +14,10 @@ const (
 )
 
 type Logger struct {
-	commandBus *cqrs.CommandBus
+	commandBus application.ICommandBus
 }
 
-func NewLogger(commandBus *cqrs.CommandBus) *Logger {
+func NewLogger(commandBus application.ICommandBus) *Logger {
 	return &Logger{commandBus: commandBus}
 }
 
