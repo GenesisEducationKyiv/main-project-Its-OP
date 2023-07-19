@@ -37,11 +37,6 @@ func AddCommandBus(busConfig *RabbitMQConfig) (*cqrs.CommandBus, *message.Router
 	var commandsSubscriber *amqp.Subscriber
 	var err error
 
-	commandsPublisher, err = amqp.NewPublisher(commandsAMQPConfig, logger)
-	if err == nil {
-		commandsSubscriber, err = amqp.NewSubscriber(commandsAMQPConfig, logger)
-	}
-
 	for i := 0; i < 10; i++ {
 		var err error
 
