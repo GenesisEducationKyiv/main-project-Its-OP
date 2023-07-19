@@ -1,0 +1,20 @@
+name: build-and-lint
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build-and-lint-microservices:
+    strategy:
+      # super important if you want to see all results, even if one fails
+      # fail-fast is true by default
+      fail-fast: false
+      matrix:
+        microservice: [ 'campaign', 'coin' ]
+    uses: ./.github/workflows/build-and-lint-template.yaml
+    with:
+      microservice: ${{ matrix.microservice }}

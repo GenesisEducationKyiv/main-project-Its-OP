@@ -1,10 +1,10 @@
 package tests
 
 import (
-	"btcRate/application/services"
-	"btcRate/application/validators"
-	"btcRate/domain"
-	"btcRate/infrastructure/repositories"
+	"btcRate/campaign/application"
+	"btcRate/campaign/application/validators"
+	"btcRate/campaign/infrastructure/repositories"
+	"btcRate/common/domain"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"sync"
@@ -13,11 +13,11 @@ import (
 
 const storageFile = "artifacts/emails.json"
 
-func setup() *services.CampaignService {
+func setup() *application.CampaignService {
 	mutex := &sync.RWMutex{}
 	emailRepo, _ := repositories.NewFileEmailRepository(storageFile, mutex)
 	emailValidator := &validators.EmailValidator{}
-	service := services.NewCampaignService(emailRepo, nil, emailValidator)
+	service := application.NewCampaignService(emailRepo, nil, nil, emailValidator)
 
 	return service
 }

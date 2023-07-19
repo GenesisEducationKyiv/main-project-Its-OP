@@ -1,0 +1,31 @@
+name: run-integration-tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build-and-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+
+      - name: Get dependencies
+        run: go mod download
+        working-directory: ./src/tests
+
+      - name: Build
+        run: go build -v ./...
+        working-directory: ./src/tests
+
+      - name: Run tests
+        run: go test -v ./...
+        working-directory: ./src/tests

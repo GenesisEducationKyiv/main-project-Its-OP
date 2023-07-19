@@ -1,0 +1,16 @@
+version: 1
+threshold:
+  compliance: 100
+  coverage: 0
+dependenciesRules:
+  - package: domain.**
+    shouldOnlyDependsOn:
+      internal: [ "domain.**" ]
+  - package: application.**
+    shouldOnlyDependsOn:
+      internal: [ "domain.**", "application.**" ]
+      external: [ "domain.**", "application.**" ]
+  - package: infrastructure.**
+    shouldNotDependsOn:
+      internal: [ "web.**" ]
+      external: [ "web.**" ]
