@@ -1,3 +1,4 @@
+//go:generate mockery --name ILogger
 package application
 
 import "context"

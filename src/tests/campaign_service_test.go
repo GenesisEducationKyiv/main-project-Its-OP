@@ -4,8 +4,10 @@ import (
 	"btcRate/campaign/application"
 	"btcRate/campaign/application/validators"
 	"btcRate/campaign/infrastructure/repositories"
+	"btcRate/common/application/mocks"
 	"btcRate/common/domain"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"os"
 	"sync"
 	"testing"
@@ -13,11 +15,15 @@ import (
 
 const storageFile = "artifacts/emails.json"
 
-func setup() *application.CampaignService {
+func setup(t *testing.T) *application.CampaignService {
 	mutex := &sync.RWMutex{}
 	emailRepo, _ := repositories.NewFileEmailRepository(storageFile, mutex)
 	emailValidator := &validators.EmailValidator{}
-	service := application.NewCampaignService(emailRepo, nil, nil, emailValidator)
+
+	logger := mocks.NewILogger(t)
+	logger.EXPECT().LogInformation(mock.AnythingOfType("string")).Return(nil)
+
+	service := application.NewCampaignService(emailRepo, nil, nil, emailValidator, logger)
 
 	return service
 }
@@ -32,7 +38,7 @@ func teardown(t *testing.T) {
 func TestSubscribe_Success(t *testing.T) {
 	// Arrange
 	defer teardown(t)
-	service := setup()
+	service := setup(t)
 
 	// Act
 	err := service.Subscribe("test@example.com")
@@ -44,7 +50,7 @@ func TestSubscribe_Success(t *testing.T) {
 func TestSubscribe_Duplicate(t *testing.T) {
 	// Arrange
 	defer teardown(t)
-	service := setup()
+	service := setup(t)
 	err := service.Subscribe("test@example.com")
 	assert.Nil(t, err)
 
