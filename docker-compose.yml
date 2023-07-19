@@ -17,6 +17,8 @@ services:
       - "8080:8080"
     environment:
       - MESSAGEBUS_HOST=rabbitmq:5672
+      - MESSAGEBUS_USER=admin
+      - MESSAGEBUS_PASSWORD=admin
 
   feature-campaign:
     container_name: feature-campaign
