@@ -22,7 +22,7 @@ type RabbitMQConfig struct {
 
 func AddCommandBus(busConfig *RabbitMQConfig) (*cqrs.CommandBus, *message.Router) {
 	cqrsMarshaler := cqrs.JSONMarshaler{}
-	logger := watermill.NewStdLoggerWithOut(os.Stdout, true, true)
+	logger := watermill.NewStdLoggerWithOut(os.Stdout, false, false)
 
 	commandsAMQPConfig := amqp.NewDurableQueueConfig(fmt.Sprintf("amqp://%s:%s@%s/", busConfig.User, busConfig.Password, busConfig.Host))
 	commandsAMQPConfig.Exchange.GenerateName = func(topic string) string {
