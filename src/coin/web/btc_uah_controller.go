@@ -12,6 +12,10 @@ import (
 	"net/http"
 )
 
+type ICoinService interface {
+	GetCurrentRate(currency string, coin string) (*domain.Price, error)
+}
+
 // @title GSES2 BTC application API
 // @version 1.0.0
 // @description This is a sample server for a BTC to UAH rate application.
@@ -19,7 +23,7 @@ import (
 // @BasePath /api
 
 type btcUahController struct {
-	coinService domain.ICoinService
+	coinService ICoinService
 	currency    string
 	coin        string
 }
