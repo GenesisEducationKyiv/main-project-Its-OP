@@ -3,7 +3,6 @@ package web
 import (
 	"btcRate/campaign/application"
 	"btcRate/campaign/application/validators"
-	"btcRate/campaign/domain"
 	"btcRate/campaign/infrastructure/integrations"
 	"btcRate/campaign/infrastructure/providers"
 	"btcRate/campaign/infrastructure/repositories"
@@ -18,6 +17,11 @@ import (
 	"sync"
 )
 
+type ICampaignService interface {
+	Subscribe(email string) error
+	SendRateEmails() error
+}
+
 // @title GSES2 BTC application API
 // @version 1.0.0
 // @description This is a sample server for a BTC to UAH rate application.
@@ -25,7 +29,7 @@ import (
 // @BasePath /api
 
 type campaignController struct {
-	campaignService domain.ICampaignService
+	campaignService ICampaignService
 	currency        string
 	coin            string
 }
