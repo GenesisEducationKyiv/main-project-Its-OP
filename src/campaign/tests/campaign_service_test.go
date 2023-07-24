@@ -4,7 +4,7 @@ import (
 	"btcRate/campaign/application"
 	"btcRate/campaign/application/validators"
 	"btcRate/campaign/infrastructure/repositories"
-	"btcRate/common/domain"
+	"btcRate/coin/domain"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"sync"
