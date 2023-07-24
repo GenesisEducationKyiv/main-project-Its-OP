@@ -2,7 +2,6 @@ package providers
 
 import (
 	"btcRate/campaign/domain"
-	"btcRate/campaign/web"
 	"btcRate/common/infrastructure"
 	"encoding/json"
 	"net/http"
@@ -21,7 +20,7 @@ func NewRateProvider(client infrastructure.IHttpClient, baseURL *url.URL) *RateP
 }
 
 func (r *RateProvider) GetRate() (*domain.Rate, error) {
-	url := r.baseURL.String() + web.GetRate
+	url := r.baseURL.String() + domain.GetRate
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
