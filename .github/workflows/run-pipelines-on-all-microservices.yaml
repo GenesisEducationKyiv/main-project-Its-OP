@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  build-and-lint-microservices:
+  build-and-lint:
     strategy:
       # super important if you want to see all results, even if one fails
       # fail-fast is true by default
@@ -16,5 +16,16 @@ jobs:
       matrix:
         microservice: [ 'campaign', 'coin' ]
     uses: ./.github/workflows/build-and-lint-template.yaml
+    with:
+      microservice: ${{ matrix.microservice }}
+
+  run-integration-tests:
+    strategy:
+      # super important if you want to see all results, even if one fails
+      # fail-fast is true by default
+      fail-fast: false
+      matrix:
+        microservice: [ 'campaign', 'coin' ]
+    uses: ./.github/workflows/run-integration-tests-template.yaml
     with:
       microservice: ${{ matrix.microservice }}
