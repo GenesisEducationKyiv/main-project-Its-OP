@@ -2,9 +2,7 @@ package providers
 
 import (
 	"btcRate/campaign/domain"
-	commonDomain "btcRate/common/domain"
 	"btcRate/common/infrastructure"
-	"btcRate/common/web"
 	"encoding/json"
 	"net/http"
 	"net/url"
@@ -22,7 +20,7 @@ func NewRateProvider(client infrastructure.IHttpClient, baseURL *url.URL) *RateP
 }
 
 func (r *RateProvider) GetRate() (*domain.Rate, error) {
-	url := r.baseURL.String() + web.GetRate
+	url := r.baseURL.String() + domain.GetRate
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -31,7 +29,7 @@ func (r *RateProvider) GetRate() (*domain.Rate, error) {
 
 	resp, err := r.client.SendRequest(req)
 	if err != nil || resp.Code != http.StatusOK {
-		return nil, &commonDomain.EndpointInaccessibleError{Message: endpointInaccessibleErrorMessage}
+		return nil, &domain.EndpointInaccessibleError{Message: endpointInaccessibleErrorMessage}
 	}
 
 	var result domain.Rate

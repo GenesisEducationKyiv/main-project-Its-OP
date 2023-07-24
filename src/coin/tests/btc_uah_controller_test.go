@@ -1,6 +1,6 @@
 //go:build endToEnd
 
-package end_to_end
+package tests
 
 import (
 	"btcRate/coin/web"

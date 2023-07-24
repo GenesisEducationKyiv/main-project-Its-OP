@@ -1,7 +1,7 @@
 package validators
 
 import (
-	"btcRate/common/domain"
+	"btcRate/coin/domain"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

@@ -3,12 +3,12 @@ package web
 import (
 	"btcRate/campaign/application"
 	"btcRate/campaign/application/validators"
+	"btcRate/campaign/domain"
 	"btcRate/campaign/infrastructure/integrations"
 	"btcRate/campaign/infrastructure/providers"
 	"btcRate/campaign/infrastructure/repositories"
 	"btcRate/common/infrastructure"
 	"btcRate/common/infrastructure/extensions"
-	"btcRate/common/web"
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
@@ -58,7 +58,7 @@ func newCampaignController(
 
 	var emailValidator = &validators.EmailValidator{}
 
-	var rateProvider = providers.NewRateProvider(loggedHttpClient, &url.URL{Scheme: pc.Schema, Host: pc.Hostname, Path: web.ApiBasePath})
+	var rateProvider = providers.NewRateProvider(loggedHttpClient, &url.URL{Scheme: pc.Schema, Host: pc.Hostname, Path: domain.ApiBasePath})
 
 	var campaignService = application.NewCampaignService(emailRepository, emailClient, rateProvider, emailValidator, logger)
 

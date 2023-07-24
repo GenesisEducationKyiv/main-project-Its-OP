@@ -2,6 +2,7 @@ package web
 
 import (
 	"btcRate/campaign/docs"
+	"btcRate/campaign/domain"
 	"btcRate/common/infrastructure"
 	"btcRate/common/web"
 	"context"
@@ -30,18 +31,18 @@ func NewServerManager() ServerManager {
 
 func (*ServerManager) RunServer(fc *FileConfiguration, sc *SendgridConfiguration, pc *ProviderConfiguration, commandBus *cqrs.CommandBus) (func() error, error) {
 	r := gin.Default()
-	r.Use(web.ErrorHandlingMiddleware())
+	r.Use(ErrorHandlingMiddleware())
 
 	campaignController, err := newCampaignController(fc, sc, pc, commandBus)
 	if err != nil {
 		return nil, err
 	}
 
-	docs.SwaggerInfo.BasePath = web.ApiBasePath
-	api := r.Group(web.ApiBasePath)
+	docs.SwaggerInfo.BasePath = domain.ApiBasePath
+	api := r.Group(domain.ApiBasePath)
 	{
-		api.POST(web.Subscribe, campaignController.subscribe)
-		api.POST(web.SendEmails, campaignController.sendEmails)
+		api.POST(domain.Subscribe, campaignController.subscribe)
+		api.POST(domain.SendEmails, campaignController.sendEmails)
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
@@ -65,7 +66,7 @@ func (*ServerManager) RunServer(fc *FileConfiguration, sc *SendgridConfiguration
 }
 
 func (s *ServerManager) SendEmails(host string) (*web.Response[string], error) {
-	url := host + web.ApiBasePath + web.SendEmails
+	url := host + domain.ApiBasePath + domain.SendEmails
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
