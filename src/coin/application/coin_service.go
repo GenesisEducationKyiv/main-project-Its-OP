@@ -49,7 +49,7 @@ func (c *CoinService) GetCurrentRate(currency string, coin string) (*domain.Pric
 		return nil, err
 	}
 
-	_ = c.logger.LogInformation(fmt.Sprintf("%s, %s worth %f %s", price.Timestamp.Format("02-01-06 15:04:05.999 Z0700"), coin, price.Amount, currency))
+	_ = c.logger.Info(fmt.Sprintf("%s, %s worth %f %s", price.Timestamp.Format("02-01-06 15:04:05.999 Z0700"), coin, price.Amount, currency))
 
 	return &domain.Price{
 		Amount:    price.Amount,

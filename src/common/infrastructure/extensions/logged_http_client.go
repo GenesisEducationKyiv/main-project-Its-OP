@@ -32,10 +32,10 @@ func (c *LoggedHttpClient) SendRequest(req *http.Request) (*infrastructure.HttpR
 
 	if err != nil {
 		logMessage = fmt.Sprintf("%s,%s", timestamp.Format("02-01-06 15:04:05.999 Z0700"), url)
-		logErr = c.logger.LogError(err, logMessage)
+		logErr = c.logger.Error(err, logMessage)
 	} else {
 		logMessage = fmt.Sprintf("%s,%s,%d,'%s'", timestamp.Format("02-01-06 15:04:05.999 Z0700"), url, resp.Code, string(resp.Body))
-		logErr = c.logger.LogDebug(logMessage)
+		logErr = c.logger.Debug(logMessage)
 	}
 
 	if logErr != nil {

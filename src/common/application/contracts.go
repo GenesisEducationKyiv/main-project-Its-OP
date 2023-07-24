@@ -8,9 +8,9 @@ type IValidator[T any] interface {
 }
 
 type ILogger interface {
-	LogInformation(message string) error
-	LogDebug(message string) error
-	LogError(err error, message string) error
+	Info(message string) error
+	Debug(message string) error
+	Error(err error, message string) error
 }
 
 type ICommandBus interface {

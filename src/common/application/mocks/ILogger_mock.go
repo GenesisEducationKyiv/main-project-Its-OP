@@ -18,7 +18,7 @@ func (_m *ILogger) EXPECT() *ILogger_Expecter {
 }
 
 // LogDebug provides a mock function with given fields: message
-func (_m *ILogger) LogDebug(message string) error {
+func (_m *ILogger) Debug(message string) error {
 	ret := _m.Called(message)
 
 	var r0 error
@@ -31,7 +31,7 @@ func (_m *ILogger) LogDebug(message string) error {
 	return r0
 }
 
-// ILogger_LogDebug_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LogDebug'
+// ILogger_LogDebug_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Debug'
 type ILogger_LogDebug_Call struct {
 	*mock.Call
 }
@@ -39,7 +39,7 @@ type ILogger_LogDebug_Call struct {
 // LogDebug is a helper method to define mock.On call
 //   - message string
 func (_e *ILogger_Expecter) LogDebug(message interface{}) *ILogger_LogDebug_Call {
-	return &ILogger_LogDebug_Call{Call: _e.mock.On("LogDebug", message)}
+	return &ILogger_LogDebug_Call{Call: _e.mock.On("Debug", message)}
 }
 
 func (_c *ILogger_LogDebug_Call) Run(run func(message string)) *ILogger_LogDebug_Call {
@@ -60,7 +60,7 @@ func (_c *ILogger_LogDebug_Call) RunAndReturn(run func(string) error) *ILogger_L
 }
 
 // LogError provides a mock function with given fields: err, message
-func (_m *ILogger) LogError(err error, message string) error {
+func (_m *ILogger) Error(err error, message string) error {
 	ret := _m.Called(err, message)
 
 	var r0 error
@@ -73,7 +73,7 @@ func (_m *ILogger) LogError(err error, message string) error {
 	return r0
 }
 
-// ILogger_LogError_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LogError'
+// ILogger_LogError_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Error'
 type ILogger_LogError_Call struct {
 	*mock.Call
 }
@@ -82,7 +82,7 @@ type ILogger_LogError_Call struct {
 //   - err error
 //   - message string
 func (_e *ILogger_Expecter) LogError(err interface{}, message interface{}) *ILogger_LogError_Call {
-	return &ILogger_LogError_Call{Call: _e.mock.On("LogError", err, message)}
+	return &ILogger_LogError_Call{Call: _e.mock.On("Error", err, message)}
 }
 
 func (_c *ILogger_LogError_Call) Run(run func(err error, message string)) *ILogger_LogError_Call {
@@ -103,7 +103,7 @@ func (_c *ILogger_LogError_Call) RunAndReturn(run func(error, string) error) *IL
 }
 
 // LogInformation provides a mock function with given fields: message
-func (_m *ILogger) LogInformation(message string) error {
+func (_m *ILogger) Info(message string) error {
 	ret := _m.Called(message)
 
 	var r0 error
@@ -116,7 +116,7 @@ func (_m *ILogger) LogInformation(message string) error {
 	return r0
 }
 
-// ILogger_LogInformation_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LogInformation'
+// ILogger_LogInformation_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Info'
 type ILogger_LogInformation_Call struct {
 	*mock.Call
 }
@@ -124,7 +124,7 @@ type ILogger_LogInformation_Call struct {
 // LogInformation is a helper method to define mock.On call
 //   - message string
 func (_e *ILogger_Expecter) LogInformation(message interface{}) *ILogger_LogInformation_Call {
-	return &ILogger_LogInformation_Call{Call: _e.mock.On("LogInformation", message)}
+	return &ILogger_LogInformation_Call{Call: _e.mock.On("Info", message)}
 }
 
 func (_c *ILogger_LogInformation_Call) Run(run func(message string)) *ILogger_LogInformation_Call {
