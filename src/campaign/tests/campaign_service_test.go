@@ -3,8 +3,8 @@ package tests
 import (
 	"btcRate/campaign/application"
 	"btcRate/campaign/application/validators"
+	"btcRate/campaign/domain"
 	"btcRate/campaign/infrastructure/repositories"
-	"btcRate/common/domain"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"sync"

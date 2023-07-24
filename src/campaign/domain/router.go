@@ -1,7 +1,7 @@
-package web
+package domain
 
 const (
-	ApiBasePath        = "/api/v1"
+	ApiBasePath string = "/api/v1"
 	GetRate     string = "/rate"
 	Subscribe   string = "/subscribe"
 	SendEmails  string = "/sendEmails"

@@ -24,17 +24,17 @@ func NewServerManager() ServerManager {
 
 func (*ServerManager) RunServer(logStorageFile string) (func() error, error) {
 	r := gin.Default()
-	r.Use(web.ErrorHandlingMiddleware())
+	r.Use(ErrorHandlingMiddleware())
 
 	btcUahController, err := newBtcUahController(logStorageFile)
 	if err != nil {
 		return nil, err
 	}
 
-	docs.SwaggerInfo.BasePath = web.ApiBasePath
-	api := r.Group(web.ApiBasePath)
+	docs.SwaggerInfo.BasePath = domain.ApiBasePath
+	api := r.Group(domain.ApiBasePath)
 	{
-		api.GET(web.GetRate, btcUahController.getRate)
+		api.GET(domain.GetRate, btcUahController.getRate)
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
@@ -58,7 +58,7 @@ func (*ServerManager) RunServer(logStorageFile string) (func() error, error) {
 }
 
 func (s *ServerManager) GetRate(host string) (*web.Response[domain.Price], error) {
-	url := host + web.ApiBasePath + web.GetRate
+	url := host + domain.ApiBasePath + domain.GetRate
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
