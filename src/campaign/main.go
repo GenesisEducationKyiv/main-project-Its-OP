@@ -10,7 +10,11 @@ import (
 )
 
 func main() {
-	commandBus, router := bus.AddCommandBus(os.Getenv("KAFKA_HOST"), "campaign-consumer-group")
+	commandBus, router, err := bus.AddCommandBus(os.Getenv("KAFKA_HOST"), "campaign-consumer-group")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
 	go func() {
 		if err := router.Run(context.Background()); err != nil {
 			log.Printf("Error running router: %v", err)

@@ -20,7 +20,7 @@ type RabbitMQConfig struct {
 	Password string
 }
 
-func AddCommandBus(busConfig *RabbitMQConfig) (*cqrs.CommandBus, *message.Router) {
+func AddCommandBus(busConfig *RabbitMQConfig) (*cqrs.CommandBus, *message.Router, error) {
 	cqrsMarshaler := cqrs.JSONMarshaler{}
 	logger := watermill.NewStdLoggerWithOut(os.Stdout, false, false)
 
@@ -54,12 +54,12 @@ func AddCommandBus(busConfig *RabbitMQConfig) (*cqrs.CommandBus, *message.Router
 	}
 
 	if commandsPublisher == nil || commandsSubscriber == nil {
-		panic("Failed to connect to RabbitMQ after several attempts")
+		return nil, nil, fmt.Errorf("failed to connect to RabbitMQ after several attempts")
 	}
 
 	router, err := message.NewRouter(message.RouterConfig{}, logger)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
 	commandBus, err := cqrs.NewCommandBusWithConfig(
@@ -75,7 +75,7 @@ func AddCommandBus(busConfig *RabbitMQConfig) (*cqrs.CommandBus, *message.Router
 			Marshaler: cqrsMarshaler,
 		})
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
 	commandProcessor, err := cqrs.NewCommandProcessorWithConfig(
@@ -98,15 +98,15 @@ func AddCommandBus(busConfig *RabbitMQConfig) (*cqrs.CommandBus, *message.Router
 		},
 	)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
 	err = commandProcessor.AddHandlers(
 		command_handlers.ErrorCommandHandler{},
 	)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
-	return commandBus, router
+	return commandBus, router, nil
 }

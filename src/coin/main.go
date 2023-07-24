@@ -15,7 +15,11 @@ func main() {
 		User:     os.Getenv("RABBITMQ_USER"),
 		Password: os.Getenv("RABBITMQ_PASSWORD"),
 	}
-	commandBus, router := bus.AddCommandBus(busConfig)
+	commandBus, router, err := bus.AddCommandBus(busConfig)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
 	go func() {
 		_ = router.Run(context.Background())
 	}()
