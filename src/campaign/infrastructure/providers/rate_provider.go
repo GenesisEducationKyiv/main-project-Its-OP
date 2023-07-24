@@ -2,9 +2,9 @@ package providers
 
 import (
 	"btcRate/campaign/domain"
+	"btcRate/campaign/web"
 	commonDomain "btcRate/common/domain"
 	"btcRate/common/infrastructure"
-	"btcRate/common/web"
 	"encoding/json"
 	"net/http"
 	"net/url"

@@ -36,11 +36,11 @@ func (*ServerManager) RunServer(fc *FileConfiguration, sc *SendgridConfiguration
 		return nil, err
 	}
 
-	docs.SwaggerInfo.BasePath = web.ApiBasePath
-	api := r.Group(web.ApiBasePath)
+	docs.SwaggerInfo.BasePath = ApiBasePath
+	api := r.Group(ApiBasePath)
 	{
-		api.POST(web.Subscribe, campaignController.subscribe)
-		api.POST(web.SendEmails, campaignController.sendEmails)
+		api.POST(Subscribe, campaignController.subscribe)
+		api.POST(SendEmails, campaignController.sendEmails)
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
@@ -64,7 +64,7 @@ func (*ServerManager) RunServer(fc *FileConfiguration, sc *SendgridConfiguration
 }
 
 func (s *ServerManager) SendEmails(host string) (*web.Response[string], error) {
-	url := host + web.ApiBasePath + web.SendEmails
+	url := host + ApiBasePath + SendEmails
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
