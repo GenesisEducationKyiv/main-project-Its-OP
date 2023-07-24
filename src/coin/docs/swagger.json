@@ -1,0 +1,34 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/rate": {
+            "get": {
+                "description": "Get the current rate of BTC to UAH using any third-party service with public API",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rate"
+                ],
+                "summary": "Get current BTC to UAH rate",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status value",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,32 @@
+name: run-integration-tests
+
+on:
+  workflow_call:
+    inputs:
+      microservice:
+        required: true
+        type: string
+
+jobs:
+
+  build-and-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+
+      - name: Get dependencies
+        run: go mod download
+        working-directory: ./src/${{ inputs.microservice }}/tests
+
+      - name: Build
+        run: go build -v ./...
+        working-directory: ./src/${{ inputs.microservice }}/tests
+
+      - name: Run tests
+        run: go test -v ./...
+        working-directory: ./src/${{ inputs.microservice }}/tests

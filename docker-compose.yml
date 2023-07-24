@@ -1,0 +1,37 @@
+version: '3.8'
+
+name: btc-rate
+
+services:
+  feature-coin:
+    container_name: feature-coin
+    build:
+      context: src/.
+      dockerfile: coin/Dockerfile
+    volumes:
+      - coinData:/app/coin/data
+      - logs:/app/coin/logs
+    ports:
+      - "8080:8080"
+
+  feature-campaign:
+    container_name: feature-campaign
+    build:
+      context: src/.
+      dockerfile: campaign/Dockerfile
+    volumes:
+      - campaignData:/app/campaign/data
+      - logs:/app/campaign/logs
+    ports:
+      - "8081:8081"
+    environment:
+      - COIN_HOST=feature-coin:8080
+      - COIN_SCHEMA=http
+      - SENDGRID_KEY=your_key
+      - SENDGRID_SENDER_EMAIL=your_email
+      - SENDGRID_SENDER_NAME=your_name
+
+volumes:
+  coinData:
+  campaignData:
+  logs:
