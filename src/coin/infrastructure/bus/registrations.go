@@ -23,7 +23,7 @@ type RabbitMQConfig struct {
 
 func AddCommandBus(busConfig *RabbitMQConfig) (*cqrs.CommandBus, *message.Router, error) {
 	cqrsMarshaler := cqrs.JSONMarshaler{}
-	logger := watermill.NewStdLoggerWithOut(os.Stdout, false, false)
+	logger := watermill.NewStdLoggerWithOut(os.Stdout, true, true)
 
 	commandsAMQPConfig := amqp.NewDurableQueueConfig(fmt.Sprintf("amqp://%s:%s@%s/", busConfig.User, busConfig.Password, busConfig.Host))
 	commandsAMQPConfig.Exchange.GenerateName = func(topic string) string {
@@ -83,10 +83,10 @@ func AddCommandBus(busConfig *RabbitMQConfig) (*cqrs.CommandBus, *message.Router
 		router,
 		cqrs.CommandProcessorConfig{
 			GenerateSubscribeTopic: func(params cqrs.CommandProcessorGenerateSubscribeTopicParams) (string, error) {
-				switch params.CommandHandler.(type) {
-				case command_handlers.LogCommandHandler:
+				switch params.CommandHandler.HandlerName() {
+				case command_handlers.LogCommandHandlerName:
 					return fmt.Sprintf("%s.*", params.CommandName), nil
-				case command_handlers.ErrorCommandHandler:
+				case command_handlers.ErrorLogCommandHandlerName:
 					return fmt.Sprintf("%s.%s", params.CommandName, infrastructure.LogLevelError), nil
 				default:
 					return params.CommandName, nil
@@ -103,7 +103,7 @@ func AddCommandBus(busConfig *RabbitMQConfig) (*cqrs.CommandBus, *message.Router
 	}
 
 	err = commandProcessor.AddHandlers(
-		decorators.NewLoggedCommandHandler(command_handlers.ErrorCommandHandler{}, cqrsMarshaler.GenerateName),
+		decorators.NewLoggedCommandHandler(command_handlers.LogCommandHandler{}, cqrsMarshaler.Name),
 	)
 	if err != nil {
 		return nil, nil, err

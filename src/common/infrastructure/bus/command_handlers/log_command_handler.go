@@ -10,7 +10,7 @@ type LogCommandHandler struct {
 }
 
 func (h LogCommandHandler) HandlerName() string {
-	return "LogCommandHandler"
+	return LogCommandHandlerName
 }
 
 func (h LogCommandHandler) NewCommand() interface{} {

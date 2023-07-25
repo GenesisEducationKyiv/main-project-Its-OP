@@ -11,7 +11,7 @@ type ErrorCommandHandler struct {
 }
 
 func (h ErrorCommandHandler) HandlerName() string {
-	return "LogCommandHandler"
+	return ErrorLogCommandHandlerName
 }
 
 func (h ErrorCommandHandler) NewCommand() interface{} {

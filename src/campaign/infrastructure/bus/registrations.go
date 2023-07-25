@@ -83,8 +83,8 @@ func AddCommandBus(messageBusHost string, consumerGroup string) (*cqrs.CommandBu
 		router,
 		cqrs.CommandProcessorConfig{
 			GenerateSubscribeTopic: func(params cqrs.CommandProcessorGenerateSubscribeTopicParams) (string, error) {
-				switch params.CommandHandler.(type) {
-				case command_handlers.ErrorCommandHandler:
+				switch params.CommandHandler.HandlerName() {
+				case command_handlers.LogCommandHandlerName:
 					return fmt.Sprintf("%s.%s", params.CommandName, infrastructure.LogLevelError), nil
 				default:
 					return params.CommandName, nil
@@ -101,7 +101,7 @@ func AddCommandBus(messageBusHost string, consumerGroup string) (*cqrs.CommandBu
 	}
 
 	err = commandProcessor.AddHandlers(
-		decorators.NewLoggedCommandHandler(command_handlers.ErrorCommandHandler{}, cqrsMarshaler.GenerateName),
+		decorators.NewLoggedCommandHandler(command_handlers.ErrorCommandHandler{}, cqrsMarshaler.Name),
 	)
 	if err != nil {
 		return nil, nil, err
