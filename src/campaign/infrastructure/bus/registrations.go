@@ -4,6 +4,7 @@ import (
 	"btcRate/common/infrastructure"
 	"btcRate/common/infrastructure/bus/command_handlers"
 	"btcRate/common/infrastructure/bus/commands"
+	"btcRate/common/infrastructure/bus/decorators"
 	"fmt"
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
@@ -100,7 +101,7 @@ func AddCommandBus(messageBusHost string, consumerGroup string) (*cqrs.CommandBu
 	}
 
 	err = commandProcessor.AddHandlers(
-		command_handlers.ErrorCommandHandler{},
+		decorators.NewLoggedCommandHandler(command_handlers.ErrorCommandHandler{}, cqrsMarshaler.GenerateName),
 	)
 	if err != nil {
 		return nil, nil, err
