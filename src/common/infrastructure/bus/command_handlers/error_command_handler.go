@@ -24,5 +24,6 @@ func (h ErrorCommandHandler) NewCommand() interface{} {
 
 func (h ErrorCommandHandler) Handle(_ context.Context, cmd interface{}) error {
 	logCommand := cmd.(*commands.LogCommand)
-	return h.logger.Error(logCommand.LogMessage, logCommand.LogAttributes)
+	h.logger.Error(logCommand.LogMessage, logCommand.LogAttributes)
+	return nil
 }

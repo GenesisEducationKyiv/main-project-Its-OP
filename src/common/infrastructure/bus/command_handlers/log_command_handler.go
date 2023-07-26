@@ -27,15 +27,17 @@ func (h LogCommandHandler) Handle(_ context.Context, cmd interface{}) error {
 	logCommand := cmd.(*commands.LogCommand)
 	switch logCommand.LogLevel {
 	case slog.LevelInfo:
-		return h.logger.Info(logCommand.LogMessage, logCommand.LogAttributes)
+		h.logger.Info(logCommand.LogMessage, logCommand.LogAttributes)
 
 	case slog.LevelDebug:
-		return h.logger.Debug(logCommand.LogMessage, logCommand.LogAttributes)
+		h.logger.Debug(logCommand.LogMessage, logCommand.LogAttributes)
 
 	case slog.LevelError:
-		return h.logger.Error(logCommand.LogMessage, logCommand.LogAttributes)
+		h.logger.Error(logCommand.LogMessage, logCommand.LogAttributes)
 
 	default:
-		return h.logger.Error("cannot handle log level", "log_level", logCommand.LogLevel, "command")
+		h.logger.Error("cannot handle log level", "log_level", logCommand.LogLevel, "command")
 	}
+
+	return nil
 }

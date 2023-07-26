@@ -23,7 +23,7 @@ func setup(t *testing.T) *application.CampaignService {
 	logger := mocks.NewILogger(t)
 	logger.EXPECT().LogInformation(mock.AnythingOfType("string")).Return(nil)
 
-	service := application.NewCampaignService(emailRepo, nil, nil, emailValidator, logger)
+	service := application.NewCampaignService(emailRepo, nil, nil, emailValidator, nil)
 
 	return service
 }

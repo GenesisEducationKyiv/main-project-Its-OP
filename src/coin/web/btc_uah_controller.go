@@ -6,7 +6,7 @@ import (
 	"btcRate/coin/application/validators"
 	"btcRate/coin/domain"
 	"btcRate/coin/infrastructure/factories"
-	"btcRate/common/infrastructure"
+	"btcRate/common/infrastructure/logger"
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -32,7 +32,7 @@ func newBtcUahController(logStorageFile string, commandBus *cqrs.CommandBus) (*b
 	supportedCurrency := "UAH"
 	supportedCoin := "BTC"
 
-	logger := infrastructure.NewLogger(commandBus)
+	logger := logger.NewLogger(commandBus)
 
 	binanceFactory := factories.NewBinanceClientFactory(logger)
 	coinbaseFactory := factories.NewCoinbaseClientFactory(logger)

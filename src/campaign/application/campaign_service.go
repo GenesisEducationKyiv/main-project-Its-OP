@@ -38,7 +38,7 @@ func (c *CampaignService) Subscribe(email string) error {
 		return err
 	}
 
-	_ = c.logger.Info(fmt.Sprintf("email address %s was added to the campaign list", email))
+	c.logger.Info(fmt.Sprintf("email address %s was added to the campaign list", email))
 
 	return nil
 }
@@ -69,7 +69,7 @@ func (c *CampaignService) sendEmails(mailBody *domain.MailBody) error {
 		return err
 	}
 
-	_ = c.logger.Info(fmt.Sprintf("campaign emails have been sent to %d receivers", len(emails)))
+	c.logger.Info(fmt.Sprintf("campaign emails have been sent to %d receivers", len(emails)))
 
 	return nil
 }

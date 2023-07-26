@@ -3,7 +3,6 @@ package decorators
 import (
 	"btcRate/common/application"
 	"context"
-	"fmt"
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 )
 
@@ -27,21 +26,14 @@ func (h LogDecorator) NewCommand() interface{} {
 
 func (h LogDecorator) Handle(context context.Context, cmd interface{}) error {
 	commandName := h.generateName(cmd)
-	logErr := h.logger.Info("command processing started", "commandName", commandName)
-	if logErr != nil {
-		fmt.Println("failed to log", logErr.Error())
-	}
+	h.logger.Info("command processing started", "commandName", commandName)
 
 	err := h.handler.Handle(context, cmd)
 
 	if err == nil {
-		logErr = h.logger.Info("command processing finished", "status", "Success")
+		h.logger.Info("command processing finished", "status", "Success")
 	} else {
-		logErr = h.logger.Error("command processing finished", "status", "Failure", "error", err.Error())
-	}
-
-	if logErr != nil {
-		fmt.Println("failed to log", err.Error())
+		h.logger.Error("command processing finished", "status", "Failure", "error", err.Error())
 	}
 
 	return err
