@@ -1,13 +1,13 @@
 package command_handlers
 
 import (
+	"btcRate/common/application"
 	"btcRate/common/infrastructure/bus/commands"
 	"context"
-	"fmt"
-	"os"
 )
 
 type ErrorCommandHandler struct {
+	logger application.ILogger
 }
 
 func (h ErrorCommandHandler) HandlerName() string {
@@ -20,7 +20,5 @@ func (h ErrorCommandHandler) NewCommand() interface{} {
 
 func (h ErrorCommandHandler) Handle(_ context.Context, cmd interface{}) error {
 	logCommand := cmd.(*commands.LogCommand)
-	_, err := fmt.Fprint(os.Stderr, fmt.Sprintf("%s\n", logCommand.LogData))
-
-	return err
+	return h.logger.Error(logCommand.LogMessage, logCommand.LogAttributes)
 }
