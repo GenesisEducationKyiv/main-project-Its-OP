@@ -31,7 +31,8 @@ func (l *AsyncLogger) Error(message string, args ...any) {
 
 func (l *AsyncLogger) send(c *commands.LogCommand) {
 	if err := l.logCommandValidator.Validate(c); err != nil {
-		fmt.Println("log command is invalid:", err.Error())
+		l.Error("log command is invalid", "error", err.Error())
+		return
 	}
 
 	if err := l.commandBus.Send(context.Background(), c); err != nil {

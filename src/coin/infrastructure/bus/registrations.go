@@ -26,7 +26,7 @@ func AddCommandBus(busConfig *RabbitMQConfig, logger application.ILogger) (*cqrs
 	cqrsMarshaler := cqrs.JSONMarshaler{}
 
 	// TODO: use slog watermillLogger when Watermill enables its support
-	watermillLogger := watermill.NewStdLoggerWithOut(os.Stdout, true, true)
+	watermillLogger := watermill.NewStdLoggerWithOut(os.Stdout, false, false)
 
 	commandsAMQPConfig := amqp.NewDurableQueueConfig(fmt.Sprintf("amqp://%s:%s@%s/", busConfig.User, busConfig.Password, busConfig.Host))
 	commandsAMQPConfig.Exchange.GenerateName = func(topic string) string {
