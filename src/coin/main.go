@@ -4,6 +4,7 @@ import (
 	"btcRate/coin/infrastructure/bus"
 	"btcRate/coin/web"
 	"context"
+	"golang.org/x/exp/slog"
 	"log"
 	"os"
 	"os/signal"
@@ -15,7 +16,8 @@ func main() {
 		User:     os.Getenv("RABBITMQ_USER"),
 		Password: os.Getenv("RABBITMQ_PASSWORD"),
 	}
-	commandBus, router, err := bus.AddCommandBus(busConfig)
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	commandBus, router, err := bus.AddCommandBus(busConfig, logger)
 	if err != nil {
 		log.Fatal(err.Error())
 	}

@@ -4,13 +4,15 @@ import (
 	"btcRate/campaign/infrastructure/bus"
 	"btcRate/campaign/web"
 	"context"
+	"golang.org/x/exp/slog"
 	"log"
 	"os"
 	"os/signal"
 )
 
 func main() {
-	commandBus, router, err := bus.AddCommandBus(os.Getenv("KAFKA_HOST"), "campaign-consumer-group")
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	commandBus, router, err := bus.AddCommandBus(os.Getenv("KAFKA_HOST"), "campaign-consumer-group", logger)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
