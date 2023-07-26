@@ -16,7 +16,7 @@ func main() {
 		User:     os.Getenv("RABBITMQ_USER"),
 		Password: os.Getenv("RABBITMQ_PASSWORD"),
 	}
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	commandBus, router, err := bus.AddCommandBus(busConfig, logger)
 	if err != nil {
 		log.Fatal(err.Error())

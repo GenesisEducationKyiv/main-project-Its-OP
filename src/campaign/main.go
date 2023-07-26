@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	commandBus, router, err := bus.AddCommandBus(os.Getenv("KAFKA_HOST"), "campaign-consumer-group", logger)
 	if err != nil {
 		log.Fatal(err.Error())
