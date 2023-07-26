@@ -32,8 +32,7 @@ func (c *LoggedHttpClient) SendRequest(req *http.Request) (*infrastructure.HttpR
 		logMessage = fmt.Sprintf("%s,%s", timestamp.Format("02-01-06 15:04:05.999 Z0700"), url)
 		c.logger.Error(logMessage, err)
 	} else {
-		logMessage = fmt.Sprintf("%s,%s,%d,'%s'", timestamp.Format("02-01-06 15:04:05.999 Z0700"), url, resp.Code, string(resp.Body))
-		c.logger.Debug(logMessage)
+		c.logger.Debug("http request executed", "status", "Success", "code", resp.Code, "url", url, "responseBody", string(resp.Body))
 	}
 
 	return resp, err
