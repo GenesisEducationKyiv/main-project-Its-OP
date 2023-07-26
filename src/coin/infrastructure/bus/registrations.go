@@ -1,7 +1,7 @@
 package bus
 
 import (
-	"btcRate/common/infrastructure"
+	"btcRate/common/application"
 	"btcRate/common/infrastructure/bus/command_handlers"
 	"btcRate/common/infrastructure/bus/commands"
 	"btcRate/common/infrastructure/bus/decorators"
@@ -10,6 +10,7 @@ import (
 	"github.com/ThreeDotsLabs/watermill-amqp/v2/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/ThreeDotsLabs/watermill/message"
+	"golang.org/x/exp/slog"
 	"log"
 	"os"
 	"time"
@@ -21,9 +22,11 @@ type RabbitMQConfig struct {
 	Password string
 }
 
-func AddCommandBus(busConfig *RabbitMQConfig) (*cqrs.CommandBus, *message.Router, error) {
+func AddCommandBus(busConfig *RabbitMQConfig, logger application.ILogger) (*cqrs.CommandBus, *message.Router, error) {
 	cqrsMarshaler := cqrs.JSONMarshaler{}
-	logger := watermill.NewStdLoggerWithOut(os.Stdout, true, true)
+
+	// TODO: use slog watermillLogger when Watermill enables its support
+	watermillLogger := watermill.NewStdLoggerWithOut(os.Stdout, true, true)
 
 	commandsAMQPConfig := amqp.NewDurableQueueConfig(fmt.Sprintf("amqp://%s:%s@%s/", busConfig.User, busConfig.Password, busConfig.Host))
 	commandsAMQPConfig.Exchange.GenerateName = func(topic string) string {
@@ -41,9 +44,9 @@ func AddCommandBus(busConfig *RabbitMQConfig) (*cqrs.CommandBus, *message.Router
 	for i := 0; i < 10; i++ {
 		var err error
 
-		commandsPublisher, err = amqp.NewPublisher(commandsAMQPConfig, logger)
+		commandsPublisher, err = amqp.NewPublisher(commandsAMQPConfig, watermillLogger)
 		if err == nil {
-			commandsSubscriber, err = amqp.NewSubscriber(commandsAMQPConfig, logger)
+			commandsSubscriber, err = amqp.NewSubscriber(commandsAMQPConfig, watermillLogger)
 		}
 
 		if err != nil {
@@ -58,7 +61,7 @@ func AddCommandBus(busConfig *RabbitMQConfig) (*cqrs.CommandBus, *message.Router
 		return nil, nil, fmt.Errorf("failed to connect to RabbitMQ after several attempts")
 	}
 
-	router, err := message.NewRouter(message.RouterConfig{}, logger)
+	router, err := message.NewRouter(message.RouterConfig{}, watermillLogger)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -69,7 +72,7 @@ func AddCommandBus(busConfig *RabbitMQConfig) (*cqrs.CommandBus, *message.Router
 			GeneratePublishTopic: func(params cqrs.CommandBusGeneratePublishTopicParams) (string, error) {
 				// Custom routing for LogCommands
 				if logCommand, ok := params.Command.(*commands.LogCommand); ok {
-					return fmt.Sprintf("%s.%s", params.CommandName, logCommand.LogLevel), nil
+					return fmt.Sprintf("%s.%s", params.CommandName, logCommand.LogLevel.String()), nil
 				}
 				return params.CommandName, nil
 			},
@@ -87,7 +90,7 @@ func AddCommandBus(busConfig *RabbitMQConfig) (*cqrs.CommandBus, *message.Router
 				case command_handlers.LogCommandHandlerName:
 					return fmt.Sprintf("%s.*", params.CommandName), nil
 				case command_handlers.ErrorLogCommandHandlerName:
-					return fmt.Sprintf("%s.%s", params.CommandName, infrastructure.LogLevelError), nil
+					return fmt.Sprintf("%s.%s", params.CommandName, slog.LevelError.String()), nil
 				default:
 					return params.CommandName, nil
 				}
@@ -103,7 +106,7 @@ func AddCommandBus(busConfig *RabbitMQConfig) (*cqrs.CommandBus, *message.Router
 	}
 
 	err = commandProcessor.AddHandlers(
-		decorators.NewLoggedCommandHandler(command_handlers.LogCommandHandler{}, cqrsMarshaler.Name),
+		decorators.NewLoggedCommandHandler(command_handlers.NewLogCommandHandler(logger), cqrsMarshaler.Name),
 	)
 	if err != nil {
 		return nil, nil, err

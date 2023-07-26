@@ -11,6 +11,10 @@ type LogCommandHandler struct {
 	logger application.ILogger
 }
 
+func NewLogCommandHandler(logger application.ILogger) *LogCommandHandler {
+	return &LogCommandHandler{logger: logger}
+}
+
 func (h LogCommandHandler) HandlerName() string {
 	return LogCommandHandlerName
 }

@@ -10,6 +10,10 @@ type ErrorCommandHandler struct {
 	logger application.ILogger
 }
 
+func NewErrorCommandHandler(logger application.ILogger) *ErrorCommandHandler {
+	return &ErrorCommandHandler{logger: logger}
+}
+
 func (h ErrorCommandHandler) HandlerName() string {
 	return ErrorLogCommandHandlerName
 }

@@ -4,13 +4,13 @@ package application
 import "context"
 
 type IValidator[T any] interface {
-	Validate(T) error
+	Validate(*T) error
 }
 
 type ILogger interface {
-	Info(message string) error
-	Debug(message string) error
-	Error(err error, message string) error
+	Info(msg string, args ...any) error
+	Debug(msg string, args ...any) error
+	Error(msg string, args ...any) error
 }
 
 type ICommandBus interface {

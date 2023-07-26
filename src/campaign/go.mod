@@ -12,6 +12,7 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.1
+	golang.org/x/exp v0.0.0-20230725093048-515e97ebf090
 )
 
 require (

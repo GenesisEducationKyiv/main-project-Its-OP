@@ -1,7 +1,7 @@
 package bus
 
 import (
-	"btcRate/common/infrastructure"
+	"btcRate/common/application"
 	"btcRate/common/infrastructure/bus/command_handlers"
 	"btcRate/common/infrastructure/bus/commands"
 	"btcRate/common/infrastructure/bus/decorators"
@@ -10,14 +10,15 @@ import (
 	"github.com/ThreeDotsLabs/watermill-kafka/v2/pkg/kafka"
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/ThreeDotsLabs/watermill/message"
+	"golang.org/x/exp/slog"
 	"log"
 	"os"
 	"time"
 )
 
-func AddCommandBus(messageBusHost string, consumerGroup string) (*cqrs.CommandBus, *message.Router, error) {
+func AddCommandBus(messageBusHost string, consumerGroup string, logger application.ILogger) (*cqrs.CommandBus, *message.Router, error) {
 	cqrsMarshaler := cqrs.JSONMarshaler{}
-	logger := watermill.NewStdLoggerWithOut(os.Stdout, false, false)
+	watermillLogger := watermill.NewStdLoggerWithOut(os.Stdout, false, false)
 	commandsKafkaConfig := kafka.DefaultSaramaSyncPublisherConfig()
 
 	var commandsPublisher *kafka.Publisher
@@ -32,7 +33,7 @@ func AddCommandBus(messageBusHost string, consumerGroup string) (*cqrs.CommandBu
 				Brokers:   []string{messageBusHost},
 				Marshaler: kafka.DefaultMarshaler{},
 			},
-			logger,
+			watermillLogger,
 		)
 		if err == nil {
 			commandsSubscriber, err = kafka.NewSubscriber(
@@ -42,7 +43,7 @@ func AddCommandBus(messageBusHost string, consumerGroup string) (*cqrs.CommandBu
 					OverwriteSaramaConfig: commandsKafkaConfig,
 					ConsumerGroup:         consumerGroup,
 				},
-				logger,
+				watermillLogger,
 			)
 		}
 
@@ -58,7 +59,7 @@ func AddCommandBus(messageBusHost string, consumerGroup string) (*cqrs.CommandBu
 		return nil, nil, fmt.Errorf("failed to connect to Kafka after several attempts")
 	}
 
-	router, err := message.NewRouter(message.RouterConfig{}, logger)
+	router, err := message.NewRouter(message.RouterConfig{}, watermillLogger)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -69,7 +70,7 @@ func AddCommandBus(messageBusHost string, consumerGroup string) (*cqrs.CommandBu
 			GeneratePublishTopic: func(params cqrs.CommandBusGeneratePublishTopicParams) (string, error) {
 				// Custom routing for LogCommands
 				if logCommand, ok := params.Command.(*commands.LogCommand); ok {
-					return fmt.Sprintf("%s.%s", params.CommandName, logCommand.LogLevel), nil
+					return fmt.Sprintf("%s.%s", params.CommandName, logCommand.LogLevel.String()), nil
 				}
 				return params.CommandName, nil
 			},
@@ -84,8 +85,8 @@ func AddCommandBus(messageBusHost string, consumerGroup string) (*cqrs.CommandBu
 		cqrs.CommandProcessorConfig{
 			GenerateSubscribeTopic: func(params cqrs.CommandProcessorGenerateSubscribeTopicParams) (string, error) {
 				switch params.CommandHandler.HandlerName() {
-				case command_handlers.LogCommandHandlerName:
-					return fmt.Sprintf("%s.%s", params.CommandName, infrastructure.LogLevelError), nil
+				case command_handlers.ErrorLogCommandHandlerName:
+					return fmt.Sprintf("%s.%s", params.CommandName, slog.LevelError.String()), nil
 				default:
 					return params.CommandName, nil
 				}
@@ -101,7 +102,7 @@ func AddCommandBus(messageBusHost string, consumerGroup string) (*cqrs.CommandBu
 	}
 
 	err = commandProcessor.AddHandlers(
-		decorators.NewLoggedCommandHandler(command_handlers.ErrorCommandHandler{}, cqrsMarshaler.Name),
+		decorators.NewLoggedCommandHandler(command_handlers.NewErrorCommandHandler(logger), cqrsMarshaler.Name),
 	)
 	if err != nil {
 		return nil, nil, err
