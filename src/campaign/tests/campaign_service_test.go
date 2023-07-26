@@ -21,9 +21,9 @@ func setup(t *testing.T) *application.CampaignService {
 	emailValidator := &validators.EmailValidator{}
 
 	logger := mocks.NewILogger(t)
-	logger.EXPECT().LogInformation(mock.AnythingOfType("string")).Return(nil)
+	logger.EXPECT().Info(mock.AnythingOfType("string"), mock.Anything, mock.Anything).Return()
 
-	service := application.NewCampaignService(emailRepo, nil, nil, emailValidator, nil)
+	service := application.NewCampaignService(emailRepo, nil, nil, emailValidator, logger)
 
 	return service
 }
