@@ -1,20 +1,24 @@
 package commands
 
+import "golang.org/x/exp/slog"
+
 type LogCommand struct {
-	LogData  string
-	LogLevel string
+	LogMessage    string
+	LogAttributes []any
+	LogLevel      slog.Level
 }
 
-func NewLogCommand(data string, level string) *LogCommand {
-	return &LogCommand{LogData: data, LogLevel: level}
+func NewLogCommand(message string, attributes []any, level slog.Level) *LogCommand {
+	return &LogCommand{LogMessage: message, LogAttributes: attributes, LogLevel: level}
 }
 
 func (c *LogCommand) Reset() {
-	c.LogData = ""
+	c.LogMessage = ""
+	c.LogAttributes = make([]any, 16)
 }
 
 func (c *LogCommand) String() string {
-	return c.LogData
+	return c.LogMessage
 }
 
 func (c *LogCommand) ProtoMessage() {}
