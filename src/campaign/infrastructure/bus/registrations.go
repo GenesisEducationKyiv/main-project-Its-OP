@@ -102,7 +102,7 @@ func AddCommandBus(messageBusHost string, consumerGroup string, logger applicati
 	}
 
 	err = commandProcessor.AddHandlers(
-		decorators.NewLoggedCommandHandler(command_handlers.NewErrorCommandHandler(logger), cqrsMarshaler.Name),
+		decorators.NewLoggedCommandHandler(command_handlers.NewErrorCommandHandler(logger), cqrsMarshaler.Name, logger),
 	)
 	if err != nil {
 		return nil, nil, err

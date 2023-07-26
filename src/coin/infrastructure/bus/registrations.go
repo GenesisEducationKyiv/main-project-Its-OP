@@ -106,7 +106,7 @@ func AddCommandBus(busConfig *RabbitMQConfig, logger application.ILogger) (*cqrs
 	}
 
 	err = commandProcessor.AddHandlers(
-		decorators.NewLoggedCommandHandler(command_handlers.NewLogCommandHandler(logger), cqrsMarshaler.Name),
+		decorators.NewLoggedCommandHandler(command_handlers.NewLogCommandHandler(logger), cqrsMarshaler.Name, logger),
 	)
 	if err != nil {
 		return nil, nil, err

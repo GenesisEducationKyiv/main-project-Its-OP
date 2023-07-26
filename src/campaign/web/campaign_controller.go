@@ -9,6 +9,7 @@ import (
 	"btcRate/campaign/infrastructure/repositories"
 	"btcRate/common/infrastructure"
 	"btcRate/common/infrastructure/extensions"
+	"btcRate/common/infrastructure/logger"
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 	"github.com/gin-gonic/gin"
 	"github.com/sendgrid/sendgrid-go"
@@ -51,7 +52,7 @@ func newCampaignController(
 
 	var sendgrid = sendgrid.NewSendClient(sc.ApiKey)
 	var emailClient = integrations.NewSendGridEmailClient(sendgrid, sc.SenderName, sc.SenderEmail)
-	logger := infrastructure.NewLogger(commandBus)
+	logger := logger.NewLogger(commandBus)
 
 	httpClient := infrastructure.NewHttpClient(nil)
 	loggedHttpClient := extensions.NewLoggedHttpClient(httpClient, logger)
