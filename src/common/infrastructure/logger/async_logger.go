@@ -4,6 +4,7 @@ import (
 	"btcRate/common/application"
 	"btcRate/common/infrastructure/bus/commands"
 	"context"
+	"fmt"
 	"golang.org/x/exp/slog"
 )
 
@@ -16,22 +17,24 @@ func NewLogger(commandBus application.ICommandBus) *AsyncLogger {
 	return &AsyncLogger{commandBus: commandBus}
 }
 
-func (l *AsyncLogger) Info(message string, args ...any) error {
-	return l.commandBus.Send(context.Background(), commands.NewLogCommand(message, args, slog.LevelInfo))
+func (l *AsyncLogger) Info(message string, args ...any) {
+	l.send(commands.NewLogCommand(message, args, slog.LevelInfo))
 }
 
-func (l *AsyncLogger) Debug(message string, args ...any) error {
-	return l.commandBus.Send(context.Background(), commands.NewLogCommand(message, args, slog.LevelDebug))
+func (l *AsyncLogger) Debug(message string, args ...any) {
+	l.send(commands.NewLogCommand(message, args, slog.LevelDebug))
 }
 
-func (l *AsyncLogger) Error(message string, args ...any) error {
-	return l.commandBus.Send(context.Background(), commands.NewLogCommand(message, args, slog.LevelError))
+func (l *AsyncLogger) Error(message string, args ...any) {
+	l.send(commands.NewLogCommand(message, args, slog.LevelError))
 }
 
-func (l *AsyncLogger) send(c *commands.LogCommand) error {
+func (l *AsyncLogger) send(c *commands.LogCommand) {
 	if err := l.logCommandValidator.Validate(c); err != nil {
-		return err
+		fmt.Println("log command is invalid:", err.Error())
 	}
 
-	return l.commandBus.Send(context.Background(), c)
+	if err := l.commandBus.Send(context.Background(), c); err != nil {
+		fmt.Println("failed to send log command:", err.Error())
+	}
 }
