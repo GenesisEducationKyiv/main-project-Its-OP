@@ -14,8 +14,8 @@ func (l LogCommandValidator) Validate(command *commands.LogCommand) error {
 	}
 
 	for index, attr := range command.LogAttributes {
-		if index%2 == 1 {
-			if _, ok := attr.(string); ok {
+		if index%2 == 0 {
+			if _, ok := attr.(string); !ok {
 				return fmt.Errorf("attribute keys must be strings: %s", command.LogAttributes)
 			}
 		}
