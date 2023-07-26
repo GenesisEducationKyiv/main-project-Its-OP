@@ -3,9 +3,7 @@ package extensions
 import (
 	"btcRate/common/application"
 	"btcRate/common/infrastructure"
-	"fmt"
 	"net/http"
-	"time"
 )
 
 type ILogRepository interface {
@@ -23,14 +21,11 @@ func NewLoggedHttpClient(httpClient infrastructure.IHttpClient, logger applicati
 
 func (c *LoggedHttpClient) SendRequest(req *http.Request) (*infrastructure.HttpResponse, error) {
 	url := req.URL.String()
-	timestamp := time.Now()
 
 	resp, err := c.httpClient.SendRequest(req)
 
-	var logMessage string
 	if err != nil {
-		logMessage = fmt.Sprintf("%s,%s", timestamp.Format("02-01-06 15:04:05.999 Z0700"), url)
-		c.logger.Error(logMessage, err)
+		c.logger.Debug("http request executed", "status", "Failure", "url", url, "error", err)
 	} else {
 		c.logger.Debug("http request executed", "status", "Success", "code", resp.Code, "url", url, "responseBody", string(resp.Body))
 	}

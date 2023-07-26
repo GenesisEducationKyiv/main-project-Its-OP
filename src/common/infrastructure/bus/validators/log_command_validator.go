@@ -5,10 +5,10 @@ import (
 	"fmt"
 )
 
-type NewLogCommandValidator struct {
+type LogCommandValidator struct {
 }
 
-func Validate(command commands.LogCommand) error {
+func (l LogCommandValidator) Validate(command *commands.LogCommand) error {
 	if len(command.LogAttributes)%2 != 0 {
 		return fmt.Errorf("attributes array must have an even length: %s", command.LogAttributes)
 	}
@@ -20,4 +20,6 @@ func Validate(command commands.LogCommand) error {
 			}
 		}
 	}
+
+	return nil
 }

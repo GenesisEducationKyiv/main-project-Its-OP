@@ -13,8 +13,8 @@ type AsyncLogger struct {
 	logCommandValidator application.IValidator[commands.LogCommand]
 }
 
-func NewLogger(commandBus application.ICommandBus) *AsyncLogger {
-	return &AsyncLogger{commandBus: commandBus}
+func NewAsyncLogger(commandBus application.ICommandBus, logCommandValidator application.IValidator[commands.LogCommand]) *AsyncLogger {
+	return &AsyncLogger{commandBus: commandBus, logCommandValidator: logCommandValidator}
 }
 
 func (l *AsyncLogger) Info(message string, args ...any) {

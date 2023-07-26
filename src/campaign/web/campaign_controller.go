@@ -8,6 +8,7 @@ import (
 	"btcRate/campaign/infrastructure/providers"
 	"btcRate/campaign/infrastructure/repositories"
 	"btcRate/common/infrastructure"
+	commonValidators "btcRate/common/infrastructure/bus/validators"
 	"btcRate/common/infrastructure/extensions"
 	"btcRate/common/infrastructure/logger"
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
@@ -52,7 +53,7 @@ func newCampaignController(
 
 	var sendgrid = sendgrid.NewSendClient(sc.ApiKey)
 	var emailClient = integrations.NewSendGridEmailClient(sendgrid, sc.SenderName, sc.SenderEmail)
-	logger := logger.NewLogger(commandBus)
+	logger := logger.NewAsyncLogger(commandBus, commonValidators.LogCommandValidator{})
 
 	httpClient := infrastructure.NewHttpClient(nil)
 	loggedHttpClient := extensions.NewLoggedHttpClient(httpClient, logger)
