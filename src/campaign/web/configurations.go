@@ -2,7 +2,6 @@ package web
 
 type FileConfiguration struct {
 	EmailStorageFile string
-	LogStorageFile   string
 }
 
 type SendgridConfiguration struct {
